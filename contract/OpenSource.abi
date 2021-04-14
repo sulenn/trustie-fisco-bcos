@@ -1,0 +1,1 @@
+[{"constant":false,"inputs":[{"name":"token_name","type":"string"},{"name":"owner","type":"string"},{"name":"total_supply","type":"int256"}],"name":"insert","outputs":[{"name":"","type":"int256"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"inputs":[],"payable":false,"stateMutability":"nonpayable","type":"constructor"}]
