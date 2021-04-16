@@ -6,7 +6,7 @@ import (
 
 	"github.com/FISCO-BCOS/go-sdk/client"
 	"github.com/FISCO-BCOS/go-sdk/conf"
-	table "github.com/sulenn/trustie-fisco-bcos/contract" // import tabletest
+	table "github.com/sulenn/trustie-fisco-bcos/contract/opensource" // import tabletest
 )
 
 func main() {

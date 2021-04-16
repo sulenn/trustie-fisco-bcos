@@ -9,7 +9,7 @@ import (
 	"github.com/FISCO-BCOS/go-sdk/client"
 	"github.com/FISCO-BCOS/go-sdk/conf"
 	"github.com/ethereum/go-ethereum/common"
-	table "github.com/sulenn/trustie-fisco-bcos/contract"
+	table "github.com/sulenn/trustie-fisco-bcos/contract/opensource"
 )
 
 func main() {
@@ -25,7 +25,7 @@ func main() {
 	}
 
 	// load the contract
-	contractAddress := common.HexToAddress("0xcb465127073489235bBB8cF6995172a7c7420b3F") // 0x9526BDd51d7F346ec2B48192f25a800825A8dBF3
+	contractAddress := common.HexToAddress("0xcb465127073489235bBB8cF6995172a7c7420b3F")
 	instance, err := table.NewOpenSource(contractAddress, client)
 	if err != nil {
 		log.Fatal(err)
@@ -36,7 +36,9 @@ func main() {
 	token_name := "repo1"
 	owner := "sulenn"
 	total_supply := big.NewInt(1000000)
-	tx, receipt, err := tabletestSession.Insert(token_name, owner, total_supply) // call Insert API
+	username := []string{"qiubing"}
+	balance := []*big.Int{big.NewInt(100000)}
+	tx, receipt, err := tabletestSession.Insert(token_name, owner, total_supply, username, balance) // call Insert API
 	if err != nil {
 		log.Fatal(err)
 	}
