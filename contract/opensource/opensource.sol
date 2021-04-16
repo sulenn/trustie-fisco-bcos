@@ -65,6 +65,9 @@ contract OpenSource {
         Table repo_table = tableFactory.openTable(REPO_TABLE);
         Condition condition = repo_table.newCondition();
         Entries entries = repo_table.select(token_name, condition);
+        if (entries.size() == 0) {
+            return ("", "", 0, 0);
+        }
         Entry entry = entries.get(0);
         return (entry.getString("token_Name"), entry.getString("owner"), entry.getInt("total_supply"), entry.getInt("cur_supply"));
     }
