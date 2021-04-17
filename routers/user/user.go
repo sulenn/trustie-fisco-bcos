@@ -22,8 +22,7 @@ import (
 // }
 
 // select user all balance
-func SelectUserAllBalance(ctx *macaron.Context, logger *log.Logger) {
-	username := ctx.Query("username")
+func SelectUserAllBalance(ctx *macaron.Context, username string, logger *log.Logger) {
 	if username == "" {
 		ctx.JSON(http.StatusOK, api.StringEmpty)
 		return
@@ -65,9 +64,7 @@ func SelectUserAllBalance(ctx *macaron.Context, logger *log.Logger) {
 }
 
 // select user balance
-func SelectUserBalance(ctx *macaron.Context, logger *log.Logger) {
-	username := ctx.Query("username")
-	tokenName := ctx.Query("tokenname")
+func SelectUserBalance(ctx *macaron.Context, username string, tokenName string, logger *log.Logger) {
 	if username == "" || tokenName == "" {
 		ctx.JSON(http.StatusOK, api.StringEmpty)
 		return

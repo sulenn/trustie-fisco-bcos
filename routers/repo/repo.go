@@ -99,8 +99,7 @@ func Create(ctx *macaron.Context, opt api.CreateRepoOption, logger *log.Logger) 
 	ctx.JSON(http.StatusOK, structs.ResRepoUnsucc)
 }
 
-func QueryBasic(ctx *macaron.Context, logger *log.Logger) {
-	tokenName := ctx.Query("tokenname")
+func QueryBasic(ctx *macaron.Context, tokenName string, logger *log.Logger) {
 	if tokenName == "" {
 		ctx.JSON(http.StatusOK, api.StringEmpty)
 		return

@@ -4,8 +4,7 @@ import (
 	"gitea.com/macaron/binding"
 	"gitea.com/macaron/macaron"
 	api "github.com/sulenn/trustie-fisco-bcos/modules/structs"
-	"github.com/sulenn/trustie-fisco-bcos/routers/repo"
-	"github.com/sulenn/trustie-fisco-bcos/routers/user"
+	"github.com/sulenn/trustie-fisco-bcos/routers/fiscobcos"
 )
 
 // NewMacaron is to create a new macaron
@@ -24,11 +23,16 @@ func RegisterRoutes(m *macaron.Macaron) {
 		ctx.JSON(200, "hello world")
 	})
 
-	m.Group("/user", func() {
-		// m.Post("/register", bind(api.CreateUserOption{}), user.Register) // 注册用户
-		m.Get("/query/allbalance", user.SelectUserAllBalance) // 查询用户所有项目Token
-		m.Get("/query/balance", user.SelectUserBalance)       // 查询用户单个项目Token
+	// 统一路由入口
+	m.Group("/trustie", func() {
+		m.Post("/fiscobcos", bind(api.FiscoBcos{}), fiscobcos.HandleAllRoutes)
 	})
+
+	// m.Group("/user", func() {
+	// 	// m.Post("/register", bind(api.CreateUserOption{}), user.Register) // 注册用户
+	// 	m.Get("/query/allbalance", user.SelectUserAllBalance) // 查询用户所有项目Token
+	// 	m.Get("/query/balance", user.SelectUserBalance)       // 查询用户单个项目Token
+	// })
 
 	// m.Group("/channel", func() {
 	// 	m.Post("/create", bind(api.CreateChannelOption{}), channel.Create) // 创建通道
@@ -44,17 +48,17 @@ func RegisterRoutes(m *macaron.Macaron) {
 	// 	m.Post("/install", bind(api.InstallChaincodeOption{}), chaincode.Install) // 安装链码
 	// })
 
-	m.Group("/repos", func() {
-		m.Post("/create", bind(api.CreateRepoOption{}), repo.Create) // 在区块链账本中新建一个项目
-		// m.Group("/amount", func() {                                  // 和 token 值相关路由
-		// 	m.Post("/transfer", bind(api.TransferTokenOption{}), repo.Transfer) // 转账
-		// 	m.Post("/add", bind(api.AddTokenOption{}), repo.Add)                // 增加账户余额
-		// 	m.Post("/minus", bind(api.MinusTokenOption{}), repo.Minus)          // 减少账户余额
-		m.Get("/query/basic", repo.QueryBasic) // 查询账户余额
-		// 	m.Get("/repo/query", repo.QueryRepoAmount)                          // 查询项目总金额
-		// })
-		// m.Group("/commit", func() {
-		// 	m.Post("/upload", bind(api.UploadCommitOption{}), repo.Upload) // 记录 commit 数据
-		// })
-	})
+	// m.Group("/repos", func() {
+	// 	m.Post("/create", bind(api.CreateRepoOption{}), repo.Create) // 在区块链账本中新建一个项目
+	// 	// m.Group("/amount", func() {                                  // 和 token 值相关路由
+	// 	// 	m.Post("/transfer", bind(api.TransferTokenOption{}), repo.Transfer) // 转账
+	// 	// 	m.Post("/add", bind(api.AddTokenOption{}), repo.Add)                // 增加账户余额
+	// 	// 	m.Post("/minus", bind(api.MinusTokenOption{}), repo.Minus)          // 减少账户余额
+	// 	m.Get("/query/basic", repo.QueryBasic) // 查询账户余额
+	// 	// 	m.Get("/repo/query", repo.QueryRepoAmount)                          // 查询项目总金额
+	// 	// })
+	// 	// m.Group("/commit", func() {
+	// 	// 	m.Post("/upload", bind(api.UploadCommitOption{}), repo.Upload) // 记录 commit 数据
+	// 	// })
+	// })
 }

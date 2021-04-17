@@ -1,7 +1,7 @@
 package structs
 
 type User struct {
-	Username  string `json:"username" binding:"Required"`
+	Username  string `json:"username"`
 	TokenName string `json:"token_name"`
 }
 
@@ -11,8 +11,3 @@ type UserBalance struct {
 }
 
 type UserBalanceList []*UserBalance
-
-// type CreateUserOption struct {
-// 	Username string `json:"username" binding:"Required"`
-// 	Orgname  string `json:"orgnization_name" binding:"Required"`
-// }
