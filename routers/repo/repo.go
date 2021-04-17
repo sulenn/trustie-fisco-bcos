@@ -51,14 +51,14 @@ func Create(ctx *macaron.Context, opt api.CreateRepoOption, logger *log.Logger) 
 
 	configs, err := conf.ParseConfigFile("config.toml")
 	if err != nil {
-		logger.Panic(err)
+		ctx.JSON(http.StatusOK, api.UnknownErr(err))
 		return
 	}
 	config := &configs[0]
 
 	client, err := client.Dial(config)
 	if err != nil {
-		logger.Panic(err)
+		ctx.JSON(http.StatusOK, api.UnknownErr(err))
 		return
 	}
 
@@ -66,7 +66,7 @@ func Create(ctx *macaron.Context, opt api.CreateRepoOption, logger *log.Logger) 
 	contractAddress := common.HexToAddress(contract.ContractAddress)
 	instance, err := opensource.NewOpenSource(contractAddress, client)
 	if err != nil {
-		logger.Panic(err)
+		ctx.JSON(http.StatusOK, api.UnknownErr(err))
 		return
 	}
 
@@ -74,7 +74,7 @@ func Create(ctx *macaron.Context, opt api.CreateRepoOption, logger *log.Logger) 
 
 	tx, receipt, err := openSourceSession.CreateRepo(tokenName, owner, totalSupply, big.NewInt(curSupply), usernameArr, balanceArr) // call Insert API
 	if err != nil {
-		logger.Panic(err)
+		ctx.JSON(http.StatusOK, api.UnknownErr(err))
 		return
 	}
 	logger.Printf("tx sent: %s\n", tx.Hash().Hex())
@@ -107,14 +107,14 @@ func QueryBasic(ctx *macaron.Context, tokenName string, logger *log.Logger) {
 
 	configs, err := conf.ParseConfigFile("config.toml")
 	if err != nil {
-		logger.Panic(err)
+		ctx.JSON(http.StatusOK, api.UnknownErr(err))
 		return
 	}
 	config := &configs[0]
 
 	client, err := client.Dial(config)
 	if err != nil {
-		logger.Panic(err)
+		ctx.JSON(http.StatusOK, api.UnknownErr(err))
 		return
 	}
 
@@ -122,7 +122,7 @@ func QueryBasic(ctx *macaron.Context, tokenName string, logger *log.Logger) {
 	contractAddress := common.HexToAddress(contract.ContractAddress)
 	instance, err := opensource.NewOpenSource(contractAddress, client)
 	if err != nil {
-		logger.Panic(err)
+		ctx.JSON(http.StatusOK, api.UnknownErr(err))
 		return
 	}
 
@@ -130,17 +130,23 @@ func QueryBasic(ctx *macaron.Context, tokenName string, logger *log.Logger) {
 
 	_, owner, totalSupply, curSupply, err := openSourceSession.SelectRepoBasicInfo(tokenName) // call Insert API
 	if err != nil {
-		logger.Panic(err)
+		ctx.JSON(http.StatusOK, api.UnknownErr(err))
 		return
 	}
 
 	fmt.Printf("tokenName: %v, owner: %v, totalSupply: %v, curSupply: %v  \n", tokenName, owner, totalSupply, curSupply)
 
-	ctx.JSON(http.StatusOK, &structs.Repo{
-		TokenName:   tokenName,
-		Owner:       owner,
-		TotalSupply: totalSupply.Uint64(),
-		CurSupply:   curSupply.Uint64(),
+	ctx.JSON(http.StatusOK, &structs.ReponseRepo{
+		Response: structs.Response{
+			Status:  0,
+			Message: "query success!",
+		},
+		Repo: structs.Repo{
+			TokenName:   tokenName,
+			Owner:       owner,
+			TotalSupply: totalSupply.Uint64(),
+			CurSupply:   curSupply.Uint64(),
+		},
 	})
 }
 

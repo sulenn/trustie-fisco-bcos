@@ -11,3 +11,13 @@ type UserBalance struct {
 }
 
 type UserBalanceList []*UserBalance
+
+type ResponseUserBalanceList struct {
+	Response
+	UserBalanceList
+}
+
+type ResponseUserBalance struct {
+	UserBalance
+	Response
+}

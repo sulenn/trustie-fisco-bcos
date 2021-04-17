@@ -16,6 +16,11 @@ type Repo struct {
 	CurSupply   uint64 `json:"cur_supply"`   // 项目当前金额
 }
 
+type ReponseRepo struct {
+	Repo
+	Response
+}
+
 // TransferTokenOption is options when to transfer amount from one person to another
 type TransferTokenOption struct {
 	TokenSymbol string `json:"reponame" binding:"Required"` // 项目名
