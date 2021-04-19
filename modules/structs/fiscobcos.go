@@ -12,4 +12,7 @@ type FiscoBcos struct {
 
 	// user 相关
 	Username string `json:"username"` // 用户名
+	Amount   uint64 `json:"amount"`   // 转账金额
+	Payer    string `json:"payer"`    // 转账人
+	Payee    string `json:"payee"`    // 收款人
 }

@@ -125,32 +125,202 @@ contract OpenSource {
         return (username_list, token_name_list, balance_list);
     } 
 
-    // // add user balance
-    // function addUserBalance(string memory username, string memory token_name) 
-    //     public
-    //     view
-    //     returns (string[] memory, string[] memory, uint256[] memory)
-    // {
-    //     Table user_table = tableFactory.openTable(USER_TABLE);
+    // add user balance
+    function addUserBalance(string memory username, string memory token_name, uint256 amount) 
+        public
+        returns (int256)
+    {
+        // 获取项目总Token数，并判断用户增加的 Token 是否导致总 Token 溢出
+        Table repo_table = tableFactory.openTable(REPO_TABLE);
+        Condition condition = repo_table.newCondition();
+        Entries entries = repo_table.select(token_name, condition);
+        if (entries.size() == 0) {
+            return -1003;
+        }
+        Entry entry = entries.get(0);
+        uint256 cur_supply = entry.getUInt("cur_supply");
+        cur_supply += amount;
+        if (cur_supply > entry.getUInt("total_supply")) {
+            return -1004;
+        }
 
-    //     Condition condition = user_table.newCondition();
-    //     condition.EQ("token_name", token_name);
+        // 获取用户
+        Table user_table = tableFactory.openTable(USER_TABLE);
+        condition = user_table.newCondition();
+        condition.EQ("token_name", token_name);
+        entries = user_table.select(username, condition);
 
-    //     Entries entries = user_table.select(username, condition);
-    //     string[] memory username_list = new string[](uint256(entries.size()));
-    //     string[] memory token_name_list = new string[](uint256(entries.size()));
-    //     uint256[] memory balance_list = new uint256[](uint256(entries.size()));
+        uint256 user_balance = amount;
+        int256 count = 0;
+        if (entries.size() == 0) {
+            // 用户不存在，插入用户信息
+            entry = user_table.newEntry();
+            entry.set("user", username);
+            entry.set("token_name", token_name);
+            entry.set("balance", user_balance);
+            count = user_table.insert(username, entry);
+            if (count != 1) {
+                return count;
+            }
+        } else {
+            // 更新用户信息
+            entry = entries.get(0);
+            Entry updated_user_entry = user_table.newEntry();
+            user_balance += entry.getUInt("balance");
+            updated_user_entry.set("balance", user_balance);
+            condition = user_table.newCondition();
+            condition.EQ("token_name", token_name);
+            condition.EQ("user", username);
+            count = user_table.update(username, updated_user_entry, condition);
+             if (count != 1) {
+                return count;
+            }
+        }
+        // 更新 repo 信息
+        condition = repo_table.newCondition();
+        entry = repo_table.newEntry();
+        entry.set("cur_supply", cur_supply);
+        condition.EQ("token_name",token_name);
+        count = repo_table.update(token_name, entry, condition);
+        
+        return count;
+    } 
 
-    //     for (int256 i = 0; i < entries.size(); ++i) {
-    //         Entry entry = entries.get(i);
+    // minus user balance
+    function minusUserBalance(string memory username, string memory token_name, uint256 amount) 
+        public
+        returns (int256)
+    {
+        // 获取项目总Token数，并判断用户减少的 Token 是否导致项目当前 Token 溢出
+        Table repo_table = tableFactory.openTable(REPO_TABLE);
+        Condition condition = repo_table.newCondition();
+        Entries entries = repo_table.select(token_name, condition);
+        if (entries.size() == 0) {
+            return -1003;
+        }
+        Entry entry = entries.get(0);
+        uint256 cur_supply = entry.getUInt("cur_supply") - amount;
 
-    //         username_list[uint256(i)] = entry.getString("user");
-    //         token_name_list[uint256(i)] = entry.getString("token_name");
-    //         balance_list[uint256(i)] = entry.getUInt("balance");
-    //     }
+        // 获取用户
+        Table user_table = tableFactory.openTable(USER_TABLE);
+        condition = user_table.newCondition();
+        condition.EQ("token_name", token_name);
+        entries = user_table.select(username, condition);
 
-    //     return (username_list, token_name_list, balance_list);
-    // } 
+        uint256 user_balance = amount;
+        int256 count = 0;
+        if (entries.size() == 0) {
+            // 用户不存在，插入用户信息
+            entry = user_table.newEntry();
+            entry.set("user", username);
+            entry.set("token_name", token_name);
+            entry.set("balance", "0");
+            count = user_table.insert(username, entry);
+            if (count != 1) {
+                return count;
+            }
+            return -1006;
+        } else {
+            // 更新用户信息
+            entry = entries.get(0);
+            Entry updated_user_entry = user_table.newEntry();
+            if  (entry.getUInt("balance") < amount) {
+                return -1006;
+            }
+            user_balance = entry.getUInt("balance") - amount;
+            updated_user_entry.set("balance", user_balance);
+            condition = user_table.newCondition();
+            condition.EQ("token_name", token_name);
+            condition.EQ("user", username);
+            count = user_table.update(username, updated_user_entry, condition);
+             if (count != 1) {
+                return count;
+            }
+        }
+        // 更新 repo 信息
+        condition = repo_table.newCondition();
+        entry = repo_table.newEntry();
+        entry.set("cur_supply", cur_supply);
+        condition.EQ("token_name",token_name);
+        count = repo_table.update(token_name, entry, condition);
+        
+        return count;
+    } 
+
+        // minus user balance
+    function transferUserBalance(string memory payer, string memory payee, string memory token_name, uint256 amount) 
+        public
+        returns (int256)
+    {
+        // 判断项目是否存在
+        Table repo_table = tableFactory.openTable(REPO_TABLE);
+        Condition condition = repo_table.newCondition();
+        Entries entries = repo_table.select(token_name, condition);
+        if (entries.size() == 0) {
+            return -1003;
+        }
+
+        // 获取转账人信息
+        Table user_table = tableFactory.openTable(USER_TABLE);
+        condition = user_table.newCondition();
+        condition.EQ("token_name", token_name);
+        entries = user_table.select(payer, condition);
+
+        int256 count = 0;
+        Entry entry = user_table.newEntry();
+        if (entries.size() == 0) {
+            // 转账人不存在，新增转账人信息
+            entry = user_table.newEntry();
+            entry.set("user", payer);
+            entry.set("token_name", token_name);
+            entry.set("balance", "0");
+            count = user_table.insert(payer, entry);
+            if (count != 1) {
+                return count;
+            }
+            return -1006;
+        } 
+        entry = entries.get(0);
+        Entry updated_entry = user_table.newEntry();
+        if  (entry.getUInt("balance") < amount) {
+            // 转账人存在，但转账人余额不足
+            return -1006;
+        }
+        
+        // 更新转账人余额
+        updated_entry.set("balance", entry.getUInt("balance")-amount);
+        condition = user_table.newCondition();
+        condition.EQ("token_name", token_name);
+        condition.EQ("user", payer);
+        count = user_table.update(payer, updated_entry, condition);
+         if (count != 1) {
+            return count;
+        }
+
+        // 判断收款人是否存在，存在则更新余额，不存在则新增
+        condition = user_table.newCondition();
+        condition.EQ("token_name", token_name);
+        entries = user_table.select(payee, condition);
+        if (entries.size() == 0) {
+            // 收款人不存在，新增收款人信息
+            entry = user_table.newEntry();
+            entry.set("user", payee);
+            entry.set("token_name", token_name);
+            entry.set("balance", amount);
+            count = user_table.insert(payee, entry);
+            return count;
+        } 
+        entry = entries.get(0);
+        updated_entry = user_table.newEntry();
+        // 更新收款人余额
+        updated_entry.set("balance", entry.getUInt("balance")+amount);
+        condition = user_table.newCondition();
+        condition.EQ("token_name", token_name);
+        condition.EQ("user", payee);
+        count = user_table.update(payee, updated_entry, condition);
+
+        return count;
+    } 
 
     function judgeReposExisted(string memory token_name) private returns (bool) {
         Table repo_table = tableFactory.openTable(REPO_TABLE);

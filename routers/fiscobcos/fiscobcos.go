@@ -30,6 +30,12 @@ func HandleAllRoutes(ctx *macaron.Context, opt api.FiscoBcos, logger *log.Logger
 		user.SelectUserBalance(ctx, opt.Username, opt.TokenName, logger)
 	case "query user balance of all repos":
 		user.SelectUserAllBalance(ctx, opt.Username, logger)
+	case "add user balance":
+		user.AddUserAmount(ctx, opt.Username, opt.TokenName, opt.Amount, logger)
+	case "minus user balance":
+		user.MinusUserAmount(ctx, opt.Username, opt.TokenName, opt.Amount, logger)
+	case "transfer amount":
+		user.TransferAmount(ctx, opt.Payer, opt.Payee, opt.TokenName, opt.Amount, logger)
 	default:
 		ctx.JSON(http.StatusNotFound, "the request type not found!")
 	}
