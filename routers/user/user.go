@@ -241,6 +241,116 @@ func MinusUserAmount(ctx *macaron.Context, username string, tokenName string, am
 	ctx.JSON(http.StatusOK, structs.ResUserMinusAmountUnsucc)
 }
 
+func LockUserAmount(ctx *macaron.Context, username string, tokenName string, amount uint64, logger *log.Logger) {
+	if username == "" || tokenName == "" {
+		ctx.JSON(http.StatusOK, api.StringEmpty)
+		return
+	}
+	configs, err := conf.ParseConfigFile("config.toml")
+	if err != nil {
+		ctx.JSON(http.StatusOK, api.UnknownErr(err))
+		return
+	}
+	config := &configs[0]
+
+	client, err := client.Dial(config)
+	if err != nil {
+		ctx.JSON(http.StatusOK, api.UnknownErr(err))
+		return
+	}
+
+	// load the contract
+	contractAddress := common.HexToAddress(contract.ContractAddress)
+	instance, err := opensource.NewOpenSource(contractAddress, client)
+	if err != nil {
+		ctx.JSON(http.StatusOK, api.UnknownErr(err))
+		return
+	}
+
+	openSourceSession := &opensource.OpenSourceSession{Contract: instance, CallOpts: *client.GetCallOpts(), TransactOpts: *client.GetTransactOpts()}
+	tx, receipt, err := openSourceSession.TransferUserBalance(username, "temporary-account", tokenName, big.NewInt(int64(amount)))
+
+	if err != nil {
+		ctx.JSON(http.StatusOK, api.UnknownErr(err))
+		return
+	}
+	logger.Printf("tx sent: %s\n", tx.Hash().Hex())
+	code, err := parseOutput(opensource.OpenSourceABI, "transferUserBalance", receipt)
+	if err != nil {
+		ctx.JSON(http.StatusOK, api.UnknownErr(err))
+		return
+	}
+	if code.Int64() > 0 {
+		logger.Printf("inserted lines: %v\n", code)
+		ctx.JSON(http.StatusOK, structs.ResUserLockAmountSucc)
+		return
+	} else if code.Int64() == contract.RepoUnexisted {
+		logger.Printf("error code: %v, message: %v\n", code, structs.ResRepoNotExisted)
+		ctx.JSON(http.StatusOK, structs.ResRepoNotExisted)
+		return
+	} else if code.Int64() == contract.UserBblanceNotEnough {
+		logger.Printf("error code: %v, message: %v\n", code, structs.ResUserBalanceNotEnough)
+		ctx.JSON(http.StatusOK, structs.ResUserBalanceNotEnough)
+		return
+	}
+	ctx.JSON(http.StatusOK, structs.ResUserLockAmountUnsucc)
+}
+
+func UnlockUserAmount(ctx *macaron.Context, username string, tokenName string, amount uint64, logger *log.Logger) {
+	if username == "" || tokenName == "" {
+		ctx.JSON(http.StatusOK, api.StringEmpty)
+		return
+	}
+	configs, err := conf.ParseConfigFile("config.toml")
+	if err != nil {
+		ctx.JSON(http.StatusOK, api.UnknownErr(err))
+		return
+	}
+	config := &configs[0]
+
+	client, err := client.Dial(config)
+	if err != nil {
+		ctx.JSON(http.StatusOK, api.UnknownErr(err))
+		return
+	}
+
+	// load the contract
+	contractAddress := common.HexToAddress(contract.ContractAddress)
+	instance, err := opensource.NewOpenSource(contractAddress, client)
+	if err != nil {
+		ctx.JSON(http.StatusOK, api.UnknownErr(err))
+		return
+	}
+
+	openSourceSession := &opensource.OpenSourceSession{Contract: instance, CallOpts: *client.GetCallOpts(), TransactOpts: *client.GetTransactOpts()}
+	tx, receipt, err := openSourceSession.TransferUserBalance("temporary-account", username, tokenName, big.NewInt(int64(amount)))
+
+	if err != nil {
+		ctx.JSON(http.StatusOK, api.UnknownErr(err))
+		return
+	}
+	logger.Printf("tx sent: %s\n", tx.Hash().Hex())
+	code, err := parseOutput(opensource.OpenSourceABI, "transferUserBalance", receipt)
+	if err != nil {
+		ctx.JSON(http.StatusOK, api.UnknownErr(err))
+		return
+	}
+	if code.Int64() > 0 {
+		logger.Printf("inserted lines: %v\n", code)
+		ctx.JSON(http.StatusOK, structs.ResUserUnlockAmountSucc)
+		return
+	} else if code.Int64() == contract.RepoUnexisted {
+		logger.Printf("error code: %v, message: %v\n", code, structs.ResRepoNotExisted)
+		ctx.JSON(http.StatusOK, structs.ResRepoNotExisted)
+		return
+	} else if code.Int64() == contract.UserBblanceNotEnough {
+		logger.Printf("error code: %v, message: %v\n", code, structs.ResUserBalanceNotEnough)
+		ctx.JSON(http.StatusOK, structs.ResUserBalanceNotEnough)
+		return
+	}
+	ctx.JSON(http.StatusOK, structs.ResUserUnlockAmountUnsucc)
+}
+
 func TransferAmount(ctx *macaron.Context, payer string, payee string, tokenName string, amount uint64, logger *log.Logger) {
 	if payer == "" || payee == "" || tokenName == "" {
 		ctx.JSON(http.StatusOK, api.StringEmpty)

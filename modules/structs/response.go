@@ -20,10 +20,14 @@ var (
 	ResUserAddAmountSucc        = &Response{Status: 0, Message: "user adds amount successfully!"}
 	ResUserMinusAmountSucc      = &Response{Status: 0, Message: "user minus amount successfully!"}
 	ResUserTransferAmountSucc   = &Response{Status: 0, Message: "user transfers amount successfully!"}
+	ResUserLockAmountSucc       = &Response{Status: 0, Message: "user locks amount successfully!"}
+	ResUserUnlockAmountSucc     = &Response{Status: 0, Message: "user unlocks amount successfully!"}
 	ResUserAddAmountUnsucc      = &Response{Status: 101, Message: "user adds amount unsuccessfully!"}
-	ResUserMinusAmountUnsucc    = &Response{Status: 101, Message: "user minus amount unsuccessfully!"}
-	ResUserTransferAmountUnsucc = &Response{Status: 101, Message: "user transfers amount unsuccessfully!"}
-	ResUserBalanceNotEnough     = &Response{Status: 102, Message: "user's Balance not enough!"}
+	ResUserMinusAmountUnsucc    = &Response{Status: 102, Message: "user minus amount unsuccessfully!"}
+	ResUserLockAmountUnsucc     = &Response{Status: 103, Message: "user locks amount unsuccessfully!"}
+	ResUserUnlockAmountUnsucc   = &Response{Status: 104, Message: "user unlocks amount unsuccessfully!"}
+	ResUserTransferAmountUnsucc = &Response{Status: 105, Message: "user transfers amount unsuccessfully!"}
+	ResUserBalanceNotEnough     = &Response{Status: 106, Message: "user's Balance not enough!"}
 
 	TypeTransferErr = &Response{Status: 10, Message: "type transfer error!"} // type transfer error!
 	StringEmpty     = &Response{Status: 11, Message: "string empty!"}        // string empty!

@@ -34,6 +34,10 @@ func HandleAllRoutes(ctx *macaron.Context, opt api.FiscoBcos, logger *log.Logger
 		user.AddUserAmount(ctx, opt.Username, opt.TokenName, opt.Amount, logger)
 	case "minus user balance":
 		user.MinusUserAmount(ctx, opt.Username, opt.TokenName, opt.Amount, logger)
+	case "lock user balance":
+		user.LockUserAmount(ctx, opt.Username, opt.TokenName, opt.Amount, logger)
+	case "unlock user balance":
+		user.UnlockUserAmount(ctx, opt.Username, opt.TokenName, opt.Amount, logger)
 	case "transfer amount":
 		user.TransferAmount(ctx, opt.Payer, opt.Payee, opt.TokenName, opt.Amount, logger)
 	default:
