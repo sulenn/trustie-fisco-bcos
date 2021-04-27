@@ -20,35 +20,3 @@ type ReponseRepo struct {
 	Repo
 	Response
 }
-
-// TransferTokenOption is options when to transfer amount from one person to another
-type TransferTokenOption struct {
-	TokenSymbol string `json:"reponame" binding:"Required"` // 项目名
-	From        string `json:"payer" binding:"Required"`    // 付款人
-	To          string `json:"payee" binding:"Required"`    // 收款人
-	Amount      uint64 `json:"amount" binding:"Required"`   // 金额
-}
-
-// AddTokenOption is options when user add amount
-type AddTokenOption struct {
-	TokenSymbol string `json:"reponame" binding:"Required"` // 项目名
-	Username    string `json:"username" binding:"Required"` // 用户名
-	Amount      uint64 `json:"amount" binding:"Required"`   // 金额
-}
-
-// MinusTokenOption is options when user minus amount
-type MinusTokenOption struct {
-	TokenSymbol string `json:"reponame" binding:"Required"` // 项目名
-	Username    string `json:"username" binding:"Required"` // 用户名
-	Amount      uint64 `json:"amount" binding:"Required"`   // 金额
-}
-
-// // UserBalance represents a user's balance
-// type UserBalance struct {
-// 	Username    string `json:"username" binding:"Required"` // 用户名
-// 	TokenSymbol string `json:"reponame" binding:"Required"` // 项目名
-// 	Balance     uint64 `json:"balance"`                     // 用户余额
-// }
-
-// // UserBalanceList represents all user's balance list in repository
-// type UserBalanceList []*UserBalance
