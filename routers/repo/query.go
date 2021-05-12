@@ -1,6 +1,7 @@
 package repo
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -129,5 +130,116 @@ func SelectPushInfo(ctx *macaron.Context, pushID string, logger *log.Logger) {
 			CommitShas: strings.Split(commitShas, "-"),
 			Time:       time,
 		},
+	})
+}
+
+// 查询 pull request 最新数据
+func SelectPullRequestLatestInfo(ctx *macaron.Context, pullRequestID string, logger *log.Logger) {
+	if pullRequestID == "" {
+		ctx.JSON(http.StatusOK, api.StringEmpty)
+		return
+	}
+
+	configs, err := conf.ParseConfigFile("config.toml")
+	if err != nil {
+		ctx.JSON(http.StatusOK, api.UnknownErr(err))
+		return
+	}
+	config := &configs[0]
+
+	client, err := client.Dial(config)
+	if err != nil {
+		ctx.JSON(http.StatusOK, api.UnknownErr(err))
+		return
+	}
+
+	// load the contract
+	contractAddress := common.HexToAddress(contract.ContractAddress)
+	instance, err := opensource.NewOpenSource(contractAddress, client)
+	if err != nil {
+		ctx.JSON(http.StatusOK, api.UnknownErr(err))
+		return
+	}
+
+	openSourceSession := &opensource.OpenSourceSession{Contract: instance, CallOpts: *client.GetCallOpts(), TransactOpts: *client.GetTransactOpts()}
+
+	_, strJSON, err := openSourceSession.SelectPullRequestInfo(pullRequestID) // call Insert API
+	if err != nil {
+		ctx.JSON(http.StatusOK, api.UnknownErr(err))
+		return
+	}
+
+	fmt.Printf("pullRequestID: %v   \n", strJSON)
+
+	var uploadPullRequestOption api.UploadPullReuqestOption
+	err = json.Unmarshal([]byte(strJSON), &uploadPullRequestOption)
+	if err != nil {
+		ctx.JSON(http.StatusOK, api.UnknownErr(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, &structs.ResponsePullRequest{
+		Response: structs.Response{
+			Status:  0,
+			Message: "query success!",
+		},
+		UploadPullReuqestOption: uploadPullRequestOption,
+	})
+}
+
+// 查询 pull request 所有数据
+func SelectPullRequestAllInfo(ctx *macaron.Context, pullRequestID string, logger *log.Logger) {
+	if pullRequestID == "" {
+		ctx.JSON(http.StatusOK, api.StringEmpty)
+		return
+	}
+
+	configs, err := conf.ParseConfigFile("config.toml")
+	if err != nil {
+		ctx.JSON(http.StatusOK, api.UnknownErr(err))
+		return
+	}
+	config := &configs[0]
+
+	client, err := client.Dial(config)
+	if err != nil {
+		ctx.JSON(http.StatusOK, api.UnknownErr(err))
+		return
+	}
+
+	// load the contract
+	contractAddress := common.HexToAddress(contract.ContractAddress)
+	instance, err := opensource.NewOpenSource(contractAddress, client)
+	if err != nil {
+		ctx.JSON(http.StatusOK, api.UnknownErr(err))
+		return
+	}
+
+	openSourceSession := &opensource.OpenSourceSession{Contract: instance, CallOpts: *client.GetCallOpts(), TransactOpts: *client.GetTransactOpts()}
+
+	_, strJSONArr, err := openSourceSession.SelectPullRequestAllInfo(pullRequestID) // call Insert API
+	if err != nil {
+		ctx.JSON(http.StatusOK, api.UnknownErr(err))
+		return
+	}
+
+	fmt.Printf("pullRequestID: %v   \n", strJSONArr)
+
+	var uploadPullRequestOption api.UploadPullReuqestOption
+	var uploadPullReuqestOptionArr api.UploadPullReuqestOptionArr
+	for i := 0; i < len(strJSONArr); i++ {
+		err = json.Unmarshal([]byte(strJSONArr[i]), &uploadPullRequestOption)
+		if err != nil {
+			ctx.JSON(http.StatusOK, api.UnknownErr(err))
+			return
+		}
+		uploadPullReuqestOptionArr = append(uploadPullReuqestOptionArr, uploadPullRequestOption)
+	}
+	ctx.JSON(http.StatusOK, &structs.ResponsePullRequestArr{
+		Response: structs.Response{
+			Status:  0,
+			Message: "query success!",
+		},
+		UploadPullReuqestOptionArr: uploadPullReuqestOptionArr,
 	})
 }

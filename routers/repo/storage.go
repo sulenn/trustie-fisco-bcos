@@ -1,6 +1,7 @@
 package repo
 
 import (
+	"encoding/json"
 	"log"
 	"math/big"
 	"net/http"
@@ -123,4 +124,55 @@ func UploadPushInfo(ctx *macaron.Context, opt api.UploadPushOption, logger *log.
 		return
 	}
 	ctx.JSON(http.StatusOK, structs.ResPushUploadUnsucc)
+}
+
+// 上传 pull request 数据
+func UploadPullRequestInfo(ctx *macaron.Context, opt api.UploadPullReuqestOption, logger *log.Logger) {
+	pullRequestID := opt.PullRequestID
+	bytesJson, err := json.Marshal(opt)
+	if err != nil {
+		ctx.JSON(http.StatusOK, api.UnknownErr(err))
+		return
+	}
+
+	configs, err := conf.ParseConfigFile("config.toml")
+	if err != nil {
+		ctx.JSON(http.StatusOK, api.UnknownErr(err))
+		return
+	}
+	config := &configs[0]
+
+	client, err := client.Dial(config)
+	if err != nil {
+		ctx.JSON(http.StatusOK, api.UnknownErr(err))
+		return
+	}
+
+	// load the contract
+	contractAddress := common.HexToAddress(contract.ContractAddress)
+	instance, err := opensource.NewOpenSource(contractAddress, client)
+	if err != nil {
+		ctx.JSON(http.StatusOK, api.UnknownErr(err))
+		return
+	}
+
+	openSourceSession := &opensource.OpenSourceSession{Contract: instance, CallOpts: *client.GetCallOpts(), TransactOpts: *client.GetTransactOpts()}
+
+	tx, receipt, err := openSourceSession.AddPullRequestData(pullRequestID, string(bytesJson)) // call Insert API
+	if err != nil {
+		ctx.JSON(http.StatusOK, api.UnknownErr(err))
+		return
+	}
+	logger.Printf("tx sent: %s\n", tx.Hash().Hex())
+	// insertedLines, err := strconv.Atoi(receipt.Output[2:])
+	code, err := parseOutput(opensource.OpenSourceABI, "addPullRequestData", receipt)
+	if err != nil {
+		logger.Panic("error when transfer string to int: ", err)
+	}
+	if code.Int64() > 0 {
+		logger.Printf("inserted lines: %v\n", code)
+		ctx.JSON(http.StatusOK, structs.ResPullRequestUploadSucc)
+		return
+	}
+	ctx.JSON(http.StatusOK, structs.ResPullRequestUploadUnsucc)
 }

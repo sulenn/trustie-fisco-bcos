@@ -28,6 +28,20 @@ type FiscoBcos struct {
 	CommitShas []string `json:"commit_shas"`
 	// repo_id, username, time
 
+	// pull request 相关
+	PullRequestID     string   `json:"pull_request_id"`
+	PullRequestNumber uint64   `json:"pull_request_number"`
+	Action            string   `json:"action"`
+	Title             string   `json:"title"`
+	SourceBranch      string   `json:"source_branch"`
+	TargetRepoID      string   `json:"target_repo_id"`
+	TargetBranch      string   `json:"target_branch"`
+	Reviewers         []string `json:"reviewers"`
+	MergeUser         string   `json:"merge_user"`
+	CreatedAt         string   `json:"created_at"`
+	UpdatedAt         string   `json:"updated_ad"`
+	// repo_id, reponame, ownername, username, content, commit_shas
+
 	// user 相关
 	Username string `json:"username"` // 用户名
 	Amount   uint64 `json:"amount"`   // 转账金额
