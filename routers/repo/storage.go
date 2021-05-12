@@ -278,3 +278,54 @@ func UploadIssueInfo(ctx *macaron.Context, opt api.UploadIssueOption, logger *lo
 	}
 	ctx.JSON(http.StatusOK, structs.ResIssueUploadUnsucc)
 }
+
+// 上传 issue comment 数据
+func UploadIssueCommentInfo(ctx *macaron.Context, opt api.UploadIssueCommentOption, logger *log.Logger) {
+	issueCommentID := opt.IssueCommentID
+	bytesJson, err := json.Marshal(opt)
+	if err != nil {
+		ctx.JSON(http.StatusOK, api.UnknownErr(err))
+		return
+	}
+
+	configs, err := conf.ParseConfigFile("config.toml")
+	if err != nil {
+		ctx.JSON(http.StatusOK, api.UnknownErr(err))
+		return
+	}
+	config := &configs[0]
+
+	client, err := client.Dial(config)
+	if err != nil {
+		ctx.JSON(http.StatusOK, api.UnknownErr(err))
+		return
+	}
+
+	// load the contract
+	contractAddress := common.HexToAddress(contract.ContractAddress)
+	instance, err := opensource.NewOpenSource(contractAddress, client)
+	if err != nil {
+		ctx.JSON(http.StatusOK, api.UnknownErr(err))
+		return
+	}
+
+	openSourceSession := &opensource.OpenSourceSession{Contract: instance, CallOpts: *client.GetCallOpts(), TransactOpts: *client.GetTransactOpts()}
+
+	tx, receipt, err := openSourceSession.AddIssueCommentData(issueCommentID, string(bytesJson)) // call Insert API
+	if err != nil {
+		ctx.JSON(http.StatusOK, api.UnknownErr(err))
+		return
+	}
+	logger.Printf("tx sent: %s\n", tx.Hash().Hex())
+	// insertedLines, err := strconv.Atoi(receipt.Output[2:])
+	code, err := parseOutput(opensource.OpenSourceABI, "addIssueCommentData", receipt)
+	if err != nil {
+		logger.Panic("error when transfer string to int: ", err)
+	}
+	if code.Int64() > 0 {
+		logger.Printf("inserted lines: %v\n", code)
+		ctx.JSON(http.StatusOK, structs.ResIssueCommentUploadSucc)
+		return
+	}
+	ctx.JSON(http.StatusOK, structs.ResIssueCommentUploadUnsucc)
+}

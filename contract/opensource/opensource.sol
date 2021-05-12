@@ -19,7 +19,7 @@ contract OpenSource {
         // the parameters of createTable are tableName,keyField,"vlaueFiled1,vlaueFiled2,vlaueFiled3,..."
         tableFactory.createTable(REPO_TABLE, "token_name", "owner,total_supply,cur_supply");
         tableFactory.createTable(USER_TABLE, "user", "token_name,balance");
-        tableFactory.createTable(COMMIT_TABLE, "commit_hash", "repo_id,author,email,time,content,commit_diff");
+        tableFactory.createTable(COMMIT_TABLE, "commit_hash", "content");
         tableFactory.createTable(PUSH_TABLE, "push_id", "push_number,repo_id,reponame,ownername,username,branch,commit_shas,time");
         tableFactory.createTable(PULL_REQUEST_TABLE, "pull_request_id", "content");
         tableFactory.createTable(PULL_REQUEST_COMMENT_TABLE, "pull_request_comment_id", "content");
@@ -591,7 +591,7 @@ contract OpenSource {
     }
 
     // select issue comment latest info
-    function selectIssueInfo(string memory issue_comment_id) 
+    function selectIssueCommentInfo(string memory issue_comment_id) 
         public
         view
         returns (string memory, string memory)
@@ -607,7 +607,7 @@ contract OpenSource {
     } 
 
     // select issue comment all info
-    function selectIssueAllInfo(string memory issue_comment_id) 
+    function selectIssueCommentAllInfo(string memory issue_comment_id) 
         public
         view
         returns (string[] memory, string[] memory)

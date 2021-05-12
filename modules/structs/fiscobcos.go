@@ -53,6 +53,11 @@ type FiscoBcos struct {
 	IssueNumber uint64 `json:"issue_number"`
 	// repo_id, reponame, ownername, action, title, content, created_at, updated_at
 
+	// repo issue comment 相关
+	IssueCommentID     string `json:"issue_comment_id"`
+	IssueCommentNumber uint64 `json:"issue_comment_number"`
+	// issue_number, repo_id, parent_id, reponame, ownername, username, action, content, created_at, updated_at
+
 	// user 相关
 	Username string `json:"username"` // 用户名
 	Amount   uint64 `json:"amount"`   // 转账金额
