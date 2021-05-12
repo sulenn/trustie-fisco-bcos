@@ -7,12 +7,14 @@ contract OpenSource {
     TableFactory tableFactory;
     string constant REPO_TABLE = "repo";
     string constant USER_TABLE = "user";
+    string constant COMMIT_TABLE = "commit";
 
     constructor() public {
         tableFactory = TableFactory(0x1001); //The fixed address is 0x1001 for TableFactory
         // the parameters of createTable are tableName,keyField,"vlaueFiled1,vlaueFiled2,vlaueFiled3,..."
         tableFactory.createTable(REPO_TABLE, "token_name", "owner,total_supply,cur_supply");
         tableFactory.createTable(USER_TABLE, "user", "token_name,balance");
+        tableFactory.createTable(COMMIT_TABLE, "commit_hash", "repo_id,author,email,time,content,commit_diff");
     }
 
     // create repo
@@ -331,4 +333,61 @@ contract OpenSource {
         }
         return false;
     }
+
+    // add commit info
+    function addCommitData(string memory commit_hash, string memory repo_id, string memory author, string memory email, 
+    string memory time, string memory content, string memory commit_diff) 
+        public
+        returns (int256)
+    {
+        Table commit_table = tableFactory.openTable(COMMIT_TABLE);
+        Entry commit_entry = commit_table.newEntry();
+        commit_entry.set("commit_hash", commit_hash);
+        commit_entry.set("repo_id", repo_id);
+        commit_entry.set("author", author);
+        commit_entry.set("email", email);
+        commit_entry.set("time", time);
+        commit_entry.set("content", content);
+        commit_entry.set("commit_diff", commit_diff);
+
+        int256 count = commit_table.insert(commit_hash, commit_entry);
+        return count;
+    }
+
+    // select commit info
+    function selectCommitInfo(string memory commit_hash) 
+        public
+        view
+        returns (string memory, string memory, string memory, string memory, string memory, string memory, string memory)
+    {
+        Table commit_table = tableFactory.openTable(COMMIT_TABLE);
+        Condition condition = commit_table.newCondition();
+        Entries entries = commit_table.select(commit_hash, condition);
+         if (entries.size() == 0) {
+            return ("", "", "", "","","","");
+        }
+        Entry entry = entries.get(entries.size()-1);
+        return (entry.getString("commit_hash"), entry.getString("repo_id"), entry.getString("author"), entry.getString("email"),
+        entry.getString("time"), entry.getString("content"), entry.getString("commit_diff"));
+    } 
+
+    // // add push info
+    // function addPushData(string memory push_id, string memory push_number, string memory repo_id, string memory reponame, 
+    // string memory ownername, string memory username, string memory branch, string memory size, string memory branch, string memory branch) 
+    //     public
+    //     returns (int256)
+    // {
+    //     Table commit_table = tableFactory.openTable(COMMIT_TABLE);
+    //     Entry commit_entry = commit_table.newEntry();
+    //     commit_entry.set("commit_hash", commit_hash);
+    //     commit_entry.set("repo_id", repo_id);
+    //     commit_entry.set("author", author);
+    //     commit_entry.set("email", email);
+    //     commit_entry.set("time", time);
+    //     commit_entry.set("content", content);
+    //     commit_entry.set("commit_diff", commit_diff);
+
+    //     int256 count = commit_table.insert(commit_hash, commit_entry);
+    //     return count;
+    // }
 }

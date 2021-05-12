@@ -14,7 +14,10 @@ var (
 	ResRepoBalanceOverFlow        = &Response{Status: 2, Message: "username balance overflow when create repo!"}             // username balance overflow when create repo!
 	ResRepoUnsucc                 = &Response{Status: 3, Message: "create repo unsuccessfully!"}                             // create repo unsuccessfully!
 	ResRepoCurBalanceUpOverFlow   = &Response{Status: 4, Message: "repo current balance up overflow when user adds amount!"} // username balance overflow when create repo!
-	ResRepoCurBalanceDownOverFlow = &Response{Status: 4, Message: "repo current balance less than 0 when user adds amount!"}
+	ResRepoCurBalanceDownOverFlow = &Response{Status: 6, Message: "repo current balance less than 0 when user adds amount!"}
+
+	ResCommitUploadSucc   = &Response{Status: 0, Message: "commit upload successfully!"}
+	ResCommitUploadUnsucc = &Response{Status: 7, Message: "commit upload unsuccessfully!"}
 
 	ResUserNotExisted           = &Response{Status: 100, Message: "user not exist!"}
 	ResUserAddAmountSucc        = &Response{Status: 0, Message: "user adds amount successfully!"}

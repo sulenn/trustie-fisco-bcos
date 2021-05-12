@@ -10,6 +10,15 @@ type FiscoBcos struct {
 	CurSupply    uint64          `json:"cur_supply"`    // 项目当前金额
 	TokenBalance [][]interface{} `json:"token_balance"` // 用户初始Token分配
 
+	// repo commit 相关
+	CommitHash string `json:"commit_hash"`
+	RepoID     string `json:"repo_id"`
+	Author     string `json:"author"`
+	Email      string `json:"email"`
+	Time       string `json:"time"`
+	Content    string `json:"message"`
+	CommitDiff string `json:"commit_diff"`
+
 	// user 相关
 	Username string `json:"username"` // 用户名
 	Amount   uint64 `json:"amount"`   // 转账金额

@@ -8,5 +8,5 @@ var (
 	RepoCurBalanceDownOverFlow int64 = -1005 // 当前项目总 Token 数低于0
 	UserBblanceNotEnough       int64 = -1006 // 用户余额不足
 
-	ContractAddress string = "0x48e9Ff2BbA3e6C4aCa2F93749F051E1008DD0F45"
+	ContractAddress string = "0x7E1b1605f299D0E6179B206B0688Ff8762E0974a"
 )
