@@ -24,6 +24,8 @@ var (
 	ResPullRequestUploadUnsucc        = &Response{Status: 9, Message: "pull request upload unsuccessfully!"}
 	ResPullRequestCommentUploadSucc   = &Response{Status: 0, Message: "pull request comment upload successfully!"}
 	ResPullRequestCommentUploadUnsucc = &Response{Status: 10, Message: "pull request comment upload unsuccessfully!"}
+	ResIssueUploadSucc                = &Response{Status: 0, Message: "issue upload successfully!"}
+	ResIssueUploadUnsucc              = &Response{Status: 10, Message: "issue upload unsuccessfully!"}
 
 	ResUserNotExisted           = &Response{Status: 100, Message: "user not exist!"}
 	ResUserAddAmountSucc        = &Response{Status: 0, Message: "user adds amount successfully!"}

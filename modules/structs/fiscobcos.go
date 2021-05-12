@@ -48,6 +48,11 @@ type FiscoBcos struct {
 	ParentID                 string `json:"parent_id"`
 	// pull_request_number, repo_id, reponame, ownername, username, action, content, created_at, updated_at
 
+	// repo issue 相关
+	IssueID     string `json:"issue_id"`
+	IssueNumber uint64 `json:"issue_number"`
+	// repo_id, reponame, ownername, action, title, content, created_at, updated_at
+
 	// user 相关
 	Username string `json:"username"` // 用户名
 	Amount   uint64 `json:"amount"`   // 转账金额

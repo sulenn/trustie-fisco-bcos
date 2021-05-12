@@ -354,3 +354,114 @@ func SelectPullRequestCommentAllInfo(ctx *macaron.Context, pullRequestCommentID 
 		UploadPullReuqestCommentOptionArr: uploadPullReuqestCommentOptionArr,
 	})
 }
+
+// 查询 issue 最新数据
+func SelectIssueLatestInfo(ctx *macaron.Context, issueID string, logger *log.Logger) {
+	if issueID == "" {
+		ctx.JSON(http.StatusOK, api.StringEmpty)
+		return
+	}
+
+	configs, err := conf.ParseConfigFile("config.toml")
+	if err != nil {
+		ctx.JSON(http.StatusOK, api.UnknownErr(err))
+		return
+	}
+	config := &configs[0]
+
+	client, err := client.Dial(config)
+	if err != nil {
+		ctx.JSON(http.StatusOK, api.UnknownErr(err))
+		return
+	}
+
+	// load the contract
+	contractAddress := common.HexToAddress(contract.ContractAddress)
+	instance, err := opensource.NewOpenSource(contractAddress, client)
+	if err != nil {
+		ctx.JSON(http.StatusOK, api.UnknownErr(err))
+		return
+	}
+
+	openSourceSession := &opensource.OpenSourceSession{Contract: instance, CallOpts: *client.GetCallOpts(), TransactOpts: *client.GetTransactOpts()}
+
+	_, strJSON, err := openSourceSession.SelectIssueInfo(issueID) // call Insert API
+	if err != nil {
+		ctx.JSON(http.StatusOK, api.UnknownErr(err))
+		return
+	}
+
+	fmt.Printf("issueID: %v   \n", strJSON)
+
+	var uploadIssueOption api.UploadIssueOption
+	err = json.Unmarshal([]byte(strJSON), &uploadIssueOption)
+	if err != nil {
+		ctx.JSON(http.StatusOK, api.UnknownErr(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, &structs.ResponseIssue{
+		Response: structs.Response{
+			Status:  0,
+			Message: "query success!",
+		},
+		UploadIssueOption: uploadIssueOption,
+	})
+}
+
+// 查询 issue 所有数据
+func SelectIssueAllInfo(ctx *macaron.Context, issueID string, logger *log.Logger) {
+	if issueID == "" {
+		ctx.JSON(http.StatusOK, api.StringEmpty)
+		return
+	}
+
+	configs, err := conf.ParseConfigFile("config.toml")
+	if err != nil {
+		ctx.JSON(http.StatusOK, api.UnknownErr(err))
+		return
+	}
+	config := &configs[0]
+
+	client, err := client.Dial(config)
+	if err != nil {
+		ctx.JSON(http.StatusOK, api.UnknownErr(err))
+		return
+	}
+
+	// load the contract
+	contractAddress := common.HexToAddress(contract.ContractAddress)
+	instance, err := opensource.NewOpenSource(contractAddress, client)
+	if err != nil {
+		ctx.JSON(http.StatusOK, api.UnknownErr(err))
+		return
+	}
+
+	openSourceSession := &opensource.OpenSourceSession{Contract: instance, CallOpts: *client.GetCallOpts(), TransactOpts: *client.GetTransactOpts()}
+
+	_, strJSONArr, err := openSourceSession.SelectIssueAllInfo(issueID) // call Insert API
+	if err != nil {
+		ctx.JSON(http.StatusOK, api.UnknownErr(err))
+		return
+	}
+
+	fmt.Printf("pullRequestID: %v   \n", strJSONArr)
+
+	var uploadIssueOption api.UploadIssueOption
+	var uploadIssueOptionArr api.UploadIssueOptionArr
+	for i := 0; i < len(strJSONArr); i++ {
+		err = json.Unmarshal([]byte(strJSONArr[i]), &uploadIssueOption)
+		if err != nil {
+			ctx.JSON(http.StatusOK, api.UnknownErr(err))
+			return
+		}
+		uploadIssueOptionArr = append(uploadIssueOptionArr, uploadIssueOption)
+	}
+	ctx.JSON(http.StatusOK, &structs.ResponseIssueArr{
+		Response: structs.Response{
+			Status:  0,
+			Message: "query success!",
+		},
+		UploadIssueOptionArr: uploadIssueOptionArr,
+	})
+}

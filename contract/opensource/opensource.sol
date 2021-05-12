@@ -11,6 +11,8 @@ contract OpenSource {
     string constant PUSH_TABLE = "push";
     string constant PULL_REQUEST_TABLE = "pull_request";
     string constant PULL_REQUEST_COMMENT_TABLE = "pull_request_comment";
+    string constant ISSUE_TABLE = "issue";
+    string constant ISSUE_COMMENT_TABLE = "issue_comment";
 
     constructor() public {
         tableFactory = TableFactory(0x1001); //The fixed address is 0x1001 for TableFactory
@@ -21,6 +23,8 @@ contract OpenSource {
         tableFactory.createTable(PUSH_TABLE, "push_id", "push_number,repo_id,reponame,ownername,username,branch,commit_shas,time");
         tableFactory.createTable(PULL_REQUEST_TABLE, "pull_request_id", "content");
         tableFactory.createTable(PULL_REQUEST_COMMENT_TABLE, "pull_request_comment_id", "content");
+        tableFactory.createTable(ISSUE_TABLE, "issue_id", "content");
+        tableFactory.createTable(ISSUE_COMMENT_TABLE, "issue_comment_id", "content");
     }
 
     // create repo
@@ -513,12 +517,114 @@ contract OpenSource {
         for (int256 i = 0; i < entries.size(); ++i) {
             Entry entry = entries.get(i);
 
-            pull_request_id_comment_list[uint256(i)] = entry.getString("pull_request_id_comment");
+            pull_request_id_comment_list[uint256(i)] = entry.getString("pull_request_comment_id");
             content_list[uint256(i)] = entry.getString("content");
         }
          
         return (pull_request_id_comment_list, content_list);
     } 
 
+    // add issue info
+    function addIssueData(string memory issue_id, string memory content) 
+        public
+        returns (int256)
+    {
+        Table issue_table = tableFactory.openTable(ISSUE_TABLE);
+        Entry issue_entry = issue_table.newEntry();
+        issue_entry.set("issue_id", issue_id);
+        issue_entry.set("content", content);
 
+        int256 count = issue_table.insert(issue_id, issue_entry);
+        return count;
+    }
+
+    // select issue latest info
+    function selectIssueInfo(string memory issue_id) 
+        public
+        view
+        returns (string memory, string memory)
+    {
+        Table issue_table = tableFactory.openTable(ISSUE_TABLE);
+        Condition condition = issue_table.newCondition();
+        Entries entries = issue_table.select(issue_id, condition);
+         if (entries.size() == 0) {
+            return ("", "");
+        }
+        Entry entry = entries.get(entries.size()-1);
+        return (entry.getString("issue_id"), entry.getString("content"));
+    } 
+
+    // select issue all info
+    function selectIssueAllInfo(string memory issue_id) 
+        public
+        view
+        returns (string[] memory, string[] memory)
+    {
+        Table issue_table = tableFactory.openTable(ISSUE_TABLE);
+        Condition condition = issue_table.newCondition();
+        Entries entries = issue_table.select(issue_id, condition);
+        string[] memory issue_list = new string[](uint256(entries.size()));
+        string[] memory content_list = new string[](uint256(entries.size()));
+         
+        for (int256 i = 0; i < entries.size(); ++i) {
+            Entry entry = entries.get(i);
+
+            issue_list[uint256(i)] = entry.getString("issue_id");
+            content_list[uint256(i)] = entry.getString("content");
+        }
+         
+        return (issue_list, content_list);
+    } 
+
+    // add issue comment info
+    function addIssueCommentData(string memory issue_comment_id, string memory content) 
+        public
+        returns (int256)
+    {
+        Table issue_comment_table = tableFactory.openTable(ISSUE_COMMENT_TABLE);
+        Entry issue_comment_entry = issue_comment_table.newEntry();
+        issue_comment_entry.set("issue_comment_id", issue_comment_id);
+        issue_comment_entry.set("content", content);
+
+        int256 count = issue_comment_table.insert(issue_comment_id, issue_comment_entry);
+        return count;
+    }
+
+    // select issue comment latest info
+    function selectIssueInfo(string memory issue_comment_id) 
+        public
+        view
+        returns (string memory, string memory)
+    {
+        Table issue_comment_table = tableFactory.openTable(ISSUE_COMMENT_TABLE);
+        Condition condition = issue_comment_table.newCondition();
+        Entries entries = issue_comment_table.select(issue_comment_id, condition);
+         if (entries.size() == 0) {
+            return ("", "");
+        }
+        Entry entry = entries.get(entries.size()-1);
+        return (entry.getString("issue_comment_id"), entry.getString("content"));
+    } 
+
+    // select issue comment all info
+    function selectIssueAllInfo(string memory issue_comment_id) 
+        public
+        view
+        returns (string[] memory, string[] memory)
+    {
+        Table issue_comment_table = tableFactory.openTable(ISSUE_COMMENT_TABLE);
+        Condition condition = issue_comment_table.newCondition();
+        Entries entries = issue_comment_table.select(issue_comment_id, condition);
+        string[] memory issue_comment_list = new string[](uint256(entries.size()));
+        string[] memory content_list = new string[](uint256(entries.size()));
+         
+        for (int256 i = 0; i < entries.size(); ++i) {
+            Entry entry = entries.get(i);
+
+            issue_comment_list[uint256(i)] = entry.getString("issue_comment_id");
+            content_list[uint256(i)] = entry.getString("content");
+        }
+         
+        return (issue_comment_list, content_list);
+    } 
 }
