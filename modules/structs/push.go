@@ -9,6 +9,7 @@ type UploadPushOption struct {
 	CommitShas []string `json:"commit_shas"`
 	RepoID     string   `json:"repo_id"`
 	Username   string   `json:"username"` // 用户名
+	Size       uint64   `json:"size"`
 	Time       string   `json:"time"`
 }
 

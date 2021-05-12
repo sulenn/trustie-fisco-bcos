@@ -20,7 +20,7 @@ contract OpenSource {
         tableFactory.createTable(REPO_TABLE, "token_name", "owner,total_supply,cur_supply");
         tableFactory.createTable(USER_TABLE, "user", "token_name,balance");
         tableFactory.createTable(COMMIT_TABLE, "commit_hash", "content");
-        tableFactory.createTable(PUSH_TABLE, "push_id", "push_number,repo_id,reponame,ownername,username,branch,commit_shas,time");
+        tableFactory.createTable(PUSH_TABLE, "push_id", "content");
         tableFactory.createTable(PULL_REQUEST_TABLE, "pull_request_id", "content");
         tableFactory.createTable(PULL_REQUEST_COMMENT_TABLE, "pull_request_comment_id", "content");
         tableFactory.createTable(ISSUE_TABLE, "issue_id", "content");
@@ -345,20 +345,14 @@ contract OpenSource {
     }
 
     // add commit info
-    function addCommitData(string memory commit_hash, string memory repo_id, string memory author, string memory email, 
-        string memory time, string memory content, string memory commit_diff) 
+    function addCommitData(string memory commit_hash, string memory content) 
         public
         returns (int256)
     {
         Table commit_table = tableFactory.openTable(COMMIT_TABLE);
         Entry commit_entry = commit_table.newEntry();
         commit_entry.set("commit_hash", commit_hash);
-        commit_entry.set("repo_id", repo_id);
-        commit_entry.set("author", author);
-        commit_entry.set("email", email);
-        commit_entry.set("time", time);
         commit_entry.set("content", content);
-        commit_entry.set("commit_diff", commit_diff);
 
         int256 count = commit_table.insert(commit_hash, commit_entry);
         return count;
@@ -368,36 +362,27 @@ contract OpenSource {
     function selectCommitInfo(string memory commit_hash) 
         public
         view
-        returns (string memory, string memory, string memory, string memory, string memory, string memory, string memory)
+        returns (string memory, string memory)
     {
         Table commit_table = tableFactory.openTable(COMMIT_TABLE);
         Condition condition = commit_table.newCondition();
         Entries entries = commit_table.select(commit_hash, condition);
          if (entries.size() == 0) {
-            return ("", "", "", "","","","");
+            return ("", "");
         }
         Entry entry = entries.get(entries.size()-1);
-        return (entry.getString("commit_hash"), entry.getString("repo_id"), entry.getString("author"), entry.getString("email"),
-        entry.getString("time"), entry.getString("content"), entry.getString("commit_diff"));
+        return (entry.getString("commit_hash"), entry.getString("content"));
     } 
 
     // add push info
-    function addPushData(string memory push_id, uint256 push_number, string memory repo_id, string memory reponame, 
-        string memory ownername, string memory username, string memory branch, string memory commit_shas, string memory time) 
+    function addPushData(string memory push_id,  string memory content) 
         public
         returns (int256)
     {
         Table push_table = tableFactory.openTable(PUSH_TABLE);
         Entry push_entry = push_table.newEntry();
         push_entry.set("push_id", push_id);
-        push_entry.set("push_number", push_number);
-        push_entry.set("repo_id", repo_id);
-        push_entry.set("reponame", reponame);
-        push_entry.set("ownername", ownername);
-        push_entry.set("username", username);
-        push_entry.set("branch", branch);
-        push_entry.set("commit_shas", commit_shas);
-        push_entry.set("time", time);
+        push_entry.set("content", content);
 
         int256 count = push_table.insert(push_id, push_entry);
         return count;
@@ -407,17 +392,16 @@ contract OpenSource {
     function selectPushInfo(string memory push_id) 
         public
         view
-        returns (string memory, uint256, string memory, string memory, string memory, string memory, string memory, string memory , string memory)
+        returns (string memory, string memory)
     {
         Table push_table = tableFactory.openTable(PUSH_TABLE);
         Condition condition = push_table.newCondition();
         Entries entries = push_table.select(push_id, condition);
          if (entries.size() == 0) {
-            return ("", 0, "", "", "","","","","");
+            return ("","");
         }
         Entry entry = entries.get(entries.size()-1);
-        return (entry.getString("push_id"), entry.getUInt("push_number"), entry.getString("repo_id"), entry.getString("reponame"), entry.getString("ownername"),
-        entry.getString("username"), entry.getString("branch"), entry.getString("commit_shas"),  entry.getString("time"));
+        return (entry.getString("push_id"),  entry.getString("content"));
     } 
 
     // add pull request info

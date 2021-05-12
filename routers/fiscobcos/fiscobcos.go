@@ -50,6 +50,7 @@ func HandleAllRoutes(ctx *macaron.Context, opt api.FiscoBcos, logger *log.Logger
 				Ownername:  opt.Ownername,
 				Username:   opt.Username,
 				Branch:     opt.Branch,
+				Size:       opt.Size,
 				CommitShas: opt.CommitShas,
 				Time:       opt.Time,
 			},

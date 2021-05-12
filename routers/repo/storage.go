@@ -3,9 +3,7 @@ package repo
 import (
 	"encoding/json"
 	"log"
-	"math/big"
 	"net/http"
-	"strings"
 
 	"github.com/FISCO-BCOS/go-sdk/client"
 	"github.com/FISCO-BCOS/go-sdk/conf"
@@ -23,12 +21,11 @@ var ()
 // 上传 commit 数据
 func UploadCommitInfo(ctx *macaron.Context, opt api.UploadCommitOption, logger *log.Logger) {
 	commitHash := opt.CommitHash
-	repoID := opt.RepoID
-	author := opt.Author
-	email := opt.Email
-	time := opt.Time
-	content := opt.Content
-	commitDiff := opt.CommitDiff
+	bytesJson, err := json.Marshal(opt)
+	if err != nil {
+		ctx.JSON(http.StatusOK, api.UnknownErr(err))
+		return
+	}
 
 	configs, err := conf.ParseConfigFile("config.toml")
 	if err != nil {
@@ -53,7 +50,7 @@ func UploadCommitInfo(ctx *macaron.Context, opt api.UploadCommitOption, logger *
 
 	openSourceSession := &opensource.OpenSourceSession{Contract: instance, CallOpts: *client.GetCallOpts(), TransactOpts: *client.GetTransactOpts()}
 
-	tx, receipt, err := openSourceSession.AddCommitData(commitHash, repoID, author, email, time, content, commitDiff) // call Insert API
+	tx, receipt, err := openSourceSession.AddCommitData(commitHash, string(bytesJson)) // call Insert API
 	if err != nil {
 		ctx.JSON(http.StatusOK, api.UnknownErr(err))
 		return
@@ -75,14 +72,11 @@ func UploadCommitInfo(ctx *macaron.Context, opt api.UploadCommitOption, logger *
 // 上传 push 数据
 func UploadPushInfo(ctx *macaron.Context, opt api.UploadPushOption, logger *log.Logger) {
 	pushID := opt.PushID
-	pushNumber := opt.PushNumber
-	repoID := opt.RepoID
-	reponame := opt.Reponame
-	ownername := opt.Ownername
-	username := opt.Username
-	branch := opt.Branch
-	commitShas := strings.Join(opt.CommitShas, "-") // 拼接字符串
-	time := opt.Time
+	bytesJson, err := json.Marshal(opt)
+	if err != nil {
+		ctx.JSON(http.StatusOK, api.UnknownErr(err))
+		return
+	}
 
 	configs, err := conf.ParseConfigFile("config.toml")
 	if err != nil {
@@ -107,7 +101,7 @@ func UploadPushInfo(ctx *macaron.Context, opt api.UploadPushOption, logger *log.
 
 	openSourceSession := &opensource.OpenSourceSession{Contract: instance, CallOpts: *client.GetCallOpts(), TransactOpts: *client.GetTransactOpts()}
 
-	tx, receipt, err := openSourceSession.AddPushData(pushID, big.NewInt(int64(pushNumber)), repoID, reponame, ownername, username, branch, commitShas, time) // call Insert API
+	tx, receipt, err := openSourceSession.AddPushData(pushID, string(bytesJson)) // call Insert API
 	if err != nil {
 		ctx.JSON(http.StatusOK, api.UnknownErr(err))
 		return

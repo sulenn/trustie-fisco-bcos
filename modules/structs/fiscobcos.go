@@ -25,6 +25,7 @@ type FiscoBcos struct {
 	Reponame   string   `json:"reponame"`
 	Ownername  string   `json:"ownername"`
 	Branch     string   `json:"branch"`
+	Size       uint64   `json:"size"`
 	CommitShas []string `json:"commit_shas"`
 	// repo_id, username, time
 

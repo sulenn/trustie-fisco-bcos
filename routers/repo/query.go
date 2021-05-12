@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"strings"
 
 	"github.com/FISCO-BCOS/go-sdk/client"
 	"github.com/FISCO-BCOS/go-sdk/conf"
@@ -50,28 +49,27 @@ func SelectCommitInfo(ctx *macaron.Context, commitHash string, logger *log.Logge
 
 	openSourceSession := &opensource.OpenSourceSession{Contract: instance, CallOpts: *client.GetCallOpts(), TransactOpts: *client.GetTransactOpts()}
 
-	_, repoID, author, email, time, message, commitDiff, err := openSourceSession.SelectCommitInfo(commitHash) // call Insert API
+	_, strJSON, err := openSourceSession.SelectCommitInfo(commitHash) // call Insert API
 	if err != nil {
 		ctx.JSON(http.StatusOK, api.UnknownErr(err))
 		return
 	}
 
-	fmt.Printf("commitHash: %v, repoID: %v, author: %v, email: %v, curStimeupply: %v, message: %v, commitDiff: %v  \n", commitHash, repoID, author, email, time, message, commitDiff)
+	fmt.Printf("commitHash: %v   \n", strJSON)
+
+	var uploadCommitOption api.UploadCommitOption
+	err = json.Unmarshal([]byte(strJSON), &uploadCommitOption)
+	if err != nil {
+		ctx.JSON(http.StatusOK, api.UnknownErr(err))
+		return
+	}
 
 	ctx.JSON(http.StatusOK, &structs.ResponseCommit{
 		Response: structs.Response{
 			Status:  0,
 			Message: "query success!",
 		},
-		UploadCommitOption: structs.UploadCommitOption{
-			CommitHash: commitHash,
-			RepoID:     repoID,
-			Author:     author,
-			Email:      email,
-			Time:       time,
-			Content:    message,
-			CommitDiff: commitDiff,
-		},
+		UploadCommitOption: uploadCommitOption,
 	})
 }
 
@@ -105,31 +103,27 @@ func SelectPushInfo(ctx *macaron.Context, pushID string, logger *log.Logger) {
 
 	openSourceSession := &opensource.OpenSourceSession{Contract: instance, CallOpts: *client.GetCallOpts(), TransactOpts: *client.GetTransactOpts()}
 
-	_, pushNumber, repoID, reponame, ownername, username, branch, commitShas, time, err := openSourceSession.SelectPushInfo(pushID) // call Insert API
+	_, strJSON, err := openSourceSession.SelectPushInfo(pushID) // call Insert API
 	if err != nil {
 		ctx.JSON(http.StatusOK, api.UnknownErr(err))
 		return
 	}
 
-	fmt.Printf("pushID: %v, pushNumber: %v, repoID: %v, reponame: %v, ownername: %v, username: %v, branch: %v, commitShas: %v, commitShas: %v   \n",
-		pushID, pushNumber, repoID, reponame, ownername, username, branch, commitShas, time)
+	fmt.Printf("pushID: %v  \n", strJSON)
+
+	var uploadPushOption api.UploadPushOption
+	err = json.Unmarshal([]byte(strJSON), &uploadPushOption)
+	if err != nil {
+		ctx.JSON(http.StatusOK, api.UnknownErr(err))
+		return
+	}
 
 	ctx.JSON(http.StatusOK, &structs.ResponsePush{
 		Response: structs.Response{
 			Status:  0,
 			Message: "query success!",
 		},
-		UploadPushOption: structs.UploadPushOption{
-			PushID:     pushID,
-			PushNumber: pushNumber.Uint64(),
-			RepoID:     repoID,
-			Reponame:   reponame,
-			Ownername:  ownername,
-			Username:   username,
-			Branch:     branch,
-			CommitShas: strings.Split(commitShas, "-"),
-			Time:       time,
-		},
+		UploadPushOption: uploadPushOption,
 	})
 }
 
