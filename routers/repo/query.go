@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/FISCO-BCOS/go-sdk/client"
 	"github.com/FISCO-BCOS/go-sdk/conf"
@@ -69,6 +70,64 @@ func SelectCommitInfo(ctx *macaron.Context, commitHash string, logger *log.Logge
 			Time:       time,
 			Content:    message,
 			CommitDiff: commitDiff,
+		},
+	})
+}
+
+// 查询 push 数据
+func SelectPushInfo(ctx *macaron.Context, pushID string, logger *log.Logger) {
+	if pushID == "" {
+		ctx.JSON(http.StatusOK, api.StringEmpty)
+		return
+	}
+
+	configs, err := conf.ParseConfigFile("config.toml")
+	if err != nil {
+		ctx.JSON(http.StatusOK, api.UnknownErr(err))
+		return
+	}
+	config := &configs[0]
+
+	client, err := client.Dial(config)
+	if err != nil {
+		ctx.JSON(http.StatusOK, api.UnknownErr(err))
+		return
+	}
+
+	// load the contract
+	contractAddress := common.HexToAddress(contract.ContractAddress)
+	instance, err := opensource.NewOpenSource(contractAddress, client)
+	if err != nil {
+		ctx.JSON(http.StatusOK, api.UnknownErr(err))
+		return
+	}
+
+	openSourceSession := &opensource.OpenSourceSession{Contract: instance, CallOpts: *client.GetCallOpts(), TransactOpts: *client.GetTransactOpts()}
+
+	_, pushNumber, repoID, reponame, ownername, username, branch, commitShas, time, err := openSourceSession.SelectPushInfo(pushID) // call Insert API
+	if err != nil {
+		ctx.JSON(http.StatusOK, api.UnknownErr(err))
+		return
+	}
+
+	fmt.Printf("pushID: %v, pushNumber: %v, repoID: %v, reponame: %v, ownername: %v, username: %v, branch: %v, commitShas: %v, commitShas: %v   \n",
+		pushID, pushNumber, repoID, reponame, ownername, username, branch, commitShas, time)
+
+	ctx.JSON(http.StatusOK, &structs.ResponsePush{
+		Response: structs.Response{
+			Status:  0,
+			Message: "query success!",
+		},
+		UploadPushOption: structs.UploadPushOption{
+			PushID:     pushID,
+			PushNumber: pushNumber.Uint64(),
+			RepoID:     repoID,
+			Reponame:   reponame,
+			Ownername:  ownername,
+			Username:   username,
+			Branch:     branch,
+			CommitShas: strings.Split(commitShas, "-"),
+			Time:       time,
 		},
 	})
 }

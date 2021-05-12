@@ -19,6 +19,15 @@ type FiscoBcos struct {
 	Content    string `json:"message"`
 	CommitDiff string `json:"commit_diff"`
 
+	// repo push 相关
+	PushID     string   `json:"push_Id"`
+	PushNumber uint64   `json:"push_number"`
+	Reponame   string   `json:"reponame"`
+	Ownername  string   `json:"ownername"`
+	Branch     string   `json:"branch"`
+	CommitShas []string `json:"commit_shas"`
+	// repo_id, username, time
+
 	// user 相关
 	Username string `json:"username"` // 用户名
 	Amount   uint64 `json:"amount"`   // 转账金额

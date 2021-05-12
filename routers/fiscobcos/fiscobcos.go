@@ -40,6 +40,22 @@ func HandleAllRoutes(ctx *macaron.Context, opt api.FiscoBcos, logger *log.Logger
 			logger)
 	case "query commit info":
 		repo.SelectCommitInfo(ctx, opt.CommitHash, logger)
+	case "upload push info":
+		repo.UploadPushInfo(ctx,
+			api.UploadPushOption{
+				PushID:     opt.PushID,
+				PushNumber: opt.PushNumber,
+				RepoID:     opt.RepoID,
+				Reponame:   opt.Reponame,
+				Ownername:  opt.Ownername,
+				Username:   opt.Username,
+				Branch:     opt.Branch,
+				CommitShas: opt.CommitShas,
+				Time:       opt.Time,
+			},
+			logger)
+	case "query push info":
+		repo.SelectPushInfo(ctx, opt.PushID, logger)
 	case "query user balance of single repo":
 		user.SelectUserBalance(ctx, opt.Username, opt.TokenName, logger)
 	case "query user balance of all repos":

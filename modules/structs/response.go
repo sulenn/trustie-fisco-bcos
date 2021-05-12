@@ -18,6 +18,8 @@ var (
 
 	ResCommitUploadSucc   = &Response{Status: 0, Message: "commit upload successfully!"}
 	ResCommitUploadUnsucc = &Response{Status: 7, Message: "commit upload unsuccessfully!"}
+	ResPushUploadSucc     = &Response{Status: 0, Message: "push upload successfully!"}
+	ResPushUploadUnsucc   = &Response{Status: 7, Message: "push upload unsuccessfully!"}
 
 	ResUserNotExisted           = &Response{Status: 100, Message: "user not exist!"}
 	ResUserAddAmountSucc        = &Response{Status: 0, Message: "user adds amount successfully!"}

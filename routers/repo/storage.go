@@ -2,7 +2,9 @@ package repo
 
 import (
 	"log"
+	"math/big"
 	"net/http"
+	"strings"
 
 	"github.com/FISCO-BCOS/go-sdk/client"
 	"github.com/FISCO-BCOS/go-sdk/conf"
@@ -67,4 +69,58 @@ func UploadCommitInfo(ctx *macaron.Context, opt api.UploadCommitOption, logger *
 		return
 	}
 	ctx.JSON(http.StatusOK, structs.ResCommitUploadUnsucc)
+}
+
+// 上传 push 数据
+func UploadPushInfo(ctx *macaron.Context, opt api.UploadPushOption, logger *log.Logger) {
+	pushID := opt.PushID
+	pushNumber := opt.PushNumber
+	repoID := opt.RepoID
+	reponame := opt.Reponame
+	ownername := opt.Ownername
+	username := opt.Username
+	branch := opt.Branch
+	commitShas := strings.Join(opt.CommitShas, "-") // 拼接字符串
+	time := opt.Time
+
+	configs, err := conf.ParseConfigFile("config.toml")
+	if err != nil {
+		ctx.JSON(http.StatusOK, api.UnknownErr(err))
+		return
+	}
+	config := &configs[0]
+
+	client, err := client.Dial(config)
+	if err != nil {
+		ctx.JSON(http.StatusOK, api.UnknownErr(err))
+		return
+	}
+
+	// load the contract
+	contractAddress := common.HexToAddress(contract.ContractAddress)
+	instance, err := opensource.NewOpenSource(contractAddress, client)
+	if err != nil {
+		ctx.JSON(http.StatusOK, api.UnknownErr(err))
+		return
+	}
+
+	openSourceSession := &opensource.OpenSourceSession{Contract: instance, CallOpts: *client.GetCallOpts(), TransactOpts: *client.GetTransactOpts()}
+
+	tx, receipt, err := openSourceSession.AddPushData(pushID, big.NewInt(int64(pushNumber)), repoID, reponame, ownername, username, branch, commitShas, time) // call Insert API
+	if err != nil {
+		ctx.JSON(http.StatusOK, api.UnknownErr(err))
+		return
+	}
+	logger.Printf("tx sent: %s\n", tx.Hash().Hex())
+	// insertedLines, err := strconv.Atoi(receipt.Output[2:])
+	code, err := parseOutput(opensource.OpenSourceABI, "addPushData", receipt)
+	if err != nil {
+		logger.Panic("error when transfer string to int: ", err)
+	}
+	if code.Int64() > 0 {
+		logger.Printf("inserted lines: %v\n", code)
+		ctx.JSON(http.StatusOK, structs.ResPushUploadSucc)
+		return
+	}
+	ctx.JSON(http.StatusOK, structs.ResPushUploadUnsucc)
 }
