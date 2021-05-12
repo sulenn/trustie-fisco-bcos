@@ -16,12 +16,14 @@ var (
 	ResRepoCurBalanceUpOverFlow   = &Response{Status: 4, Message: "repo current balance up overflow when user adds amount!"} // username balance overflow when create repo!
 	ResRepoCurBalanceDownOverFlow = &Response{Status: 6, Message: "repo current balance less than 0 when user adds amount!"}
 
-	ResCommitUploadSucc        = &Response{Status: 0, Message: "commit upload successfully!"}
-	ResCommitUploadUnsucc      = &Response{Status: 7, Message: "commit upload unsuccessfully!"}
-	ResPushUploadSucc          = &Response{Status: 0, Message: "push upload successfully!"}
-	ResPushUploadUnsucc        = &Response{Status: 8, Message: "push upload unsuccessfully!"}
-	ResPullRequestUploadSucc   = &Response{Status: 0, Message: "pull request upload successfully!"}
-	ResPullRequestUploadUnsucc = &Response{Status: 9, Message: "pull request upload unsuccessfully!"}
+	ResCommitUploadSucc               = &Response{Status: 0, Message: "commit upload successfully!"}
+	ResCommitUploadUnsucc             = &Response{Status: 7, Message: "commit upload unsuccessfully!"}
+	ResPushUploadSucc                 = &Response{Status: 0, Message: "push upload successfully!"}
+	ResPushUploadUnsucc               = &Response{Status: 8, Message: "push upload unsuccessfully!"}
+	ResPullRequestUploadSucc          = &Response{Status: 0, Message: "pull request upload successfully!"}
+	ResPullRequestUploadUnsucc        = &Response{Status: 9, Message: "pull request upload unsuccessfully!"}
+	ResPullRequestCommentUploadSucc   = &Response{Status: 0, Message: "pull request comment upload successfully!"}
+	ResPullRequestCommentUploadUnsucc = &Response{Status: 10, Message: "pull request comment upload unsuccessfully!"}
 
 	ResUserNotExisted           = &Response{Status: 100, Message: "user not exist!"}
 	ResUserAddAmountSucc        = &Response{Status: 0, Message: "user adds amount successfully!"}

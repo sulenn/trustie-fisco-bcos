@@ -243,3 +243,114 @@ func SelectPullRequestAllInfo(ctx *macaron.Context, pullRequestID string, logger
 		UploadPullReuqestOptionArr: uploadPullReuqestOptionArr,
 	})
 }
+
+// 查询 pull request comment 最新数据
+func SelectPullRequestCommentLatestInfo(ctx *macaron.Context, pullRequestCommentID string, logger *log.Logger) {
+	if pullRequestCommentID == "" {
+		ctx.JSON(http.StatusOK, api.StringEmpty)
+		return
+	}
+
+	configs, err := conf.ParseConfigFile("config.toml")
+	if err != nil {
+		ctx.JSON(http.StatusOK, api.UnknownErr(err))
+		return
+	}
+	config := &configs[0]
+
+	client, err := client.Dial(config)
+	if err != nil {
+		ctx.JSON(http.StatusOK, api.UnknownErr(err))
+		return
+	}
+
+	// load the contract
+	contractAddress := common.HexToAddress(contract.ContractAddress)
+	instance, err := opensource.NewOpenSource(contractAddress, client)
+	if err != nil {
+		ctx.JSON(http.StatusOK, api.UnknownErr(err))
+		return
+	}
+
+	openSourceSession := &opensource.OpenSourceSession{Contract: instance, CallOpts: *client.GetCallOpts(), TransactOpts: *client.GetTransactOpts()}
+
+	_, strJSON, err := openSourceSession.SelectPullRequestCommentInfo(pullRequestCommentID) // call Insert API
+	if err != nil {
+		ctx.JSON(http.StatusOK, api.UnknownErr(err))
+		return
+	}
+
+	fmt.Printf("pullRequestID: %v   \n", strJSON)
+
+	var uploadPullRequestCommentOption api.UploadPullReuqestCommentOption
+	err = json.Unmarshal([]byte(strJSON), &uploadPullRequestCommentOption)
+	if err != nil {
+		ctx.JSON(http.StatusOK, api.UnknownErr(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, &structs.ResponsePullRequestComment{
+		Response: structs.Response{
+			Status:  0,
+			Message: "query success!",
+		},
+		UploadPullReuqestCommentOption: uploadPullRequestCommentOption,
+	})
+}
+
+// 查询 pull request comment 所有数据
+func SelectPullRequestCommentAllInfo(ctx *macaron.Context, pullRequestCommentID string, logger *log.Logger) {
+	if pullRequestCommentID == "" {
+		ctx.JSON(http.StatusOK, api.StringEmpty)
+		return
+	}
+
+	configs, err := conf.ParseConfigFile("config.toml")
+	if err != nil {
+		ctx.JSON(http.StatusOK, api.UnknownErr(err))
+		return
+	}
+	config := &configs[0]
+
+	client, err := client.Dial(config)
+	if err != nil {
+		ctx.JSON(http.StatusOK, api.UnknownErr(err))
+		return
+	}
+
+	// load the contract
+	contractAddress := common.HexToAddress(contract.ContractAddress)
+	instance, err := opensource.NewOpenSource(contractAddress, client)
+	if err != nil {
+		ctx.JSON(http.StatusOK, api.UnknownErr(err))
+		return
+	}
+
+	openSourceSession := &opensource.OpenSourceSession{Contract: instance, CallOpts: *client.GetCallOpts(), TransactOpts: *client.GetTransactOpts()}
+
+	_, strJSONArr, err := openSourceSession.SelectPullRequestCommentAllInfo(pullRequestCommentID) // call Insert API
+	if err != nil {
+		ctx.JSON(http.StatusOK, api.UnknownErr(err))
+		return
+	}
+
+	fmt.Printf("pullRequestID: %v   \n", strJSONArr)
+
+	var uploadPullRequestCommentOption api.UploadPullReuqestCommentOption
+	var uploadPullReuqestCommentOptionArr api.UploadPullReuqestCommentOptionArr
+	for i := 0; i < len(strJSONArr); i++ {
+		err = json.Unmarshal([]byte(strJSONArr[i]), &uploadPullRequestCommentOption)
+		if err != nil {
+			ctx.JSON(http.StatusOK, api.UnknownErr(err))
+			return
+		}
+		uploadPullReuqestCommentOptionArr = append(uploadPullReuqestCommentOptionArr, uploadPullRequestCommentOption)
+	}
+	ctx.JSON(http.StatusOK, &structs.ResponsePullRequestCommentArr{
+		Response: structs.Response{
+			Status:  0,
+			Message: "query success!",
+		},
+		UploadPullReuqestCommentOptionArr: uploadPullReuqestCommentOptionArr,
+	})
+}

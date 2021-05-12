@@ -10,6 +10,7 @@ contract OpenSource {
     string constant COMMIT_TABLE = "commit";
     string constant PUSH_TABLE = "push";
     string constant PULL_REQUEST_TABLE = "pull_request";
+    string constant PULL_REQUEST_COMMENT_TABLE = "pull_request_comment";
 
     constructor() public {
         tableFactory = TableFactory(0x1001); //The fixed address is 0x1001 for TableFactory
@@ -19,6 +20,7 @@ contract OpenSource {
         tableFactory.createTable(COMMIT_TABLE, "commit_hash", "repo_id,author,email,time,content,commit_diff");
         tableFactory.createTable(PUSH_TABLE, "push_id", "push_number,repo_id,reponame,ownername,username,branch,commit_shas,time");
         tableFactory.createTable(PULL_REQUEST_TABLE, "pull_request_id", "content");
+        tableFactory.createTable(PULL_REQUEST_COMMENT_TABLE, "pull_request_comment_id", "content");
     }
 
     // create repo
@@ -444,7 +446,7 @@ contract OpenSource {
         return (entry.getString("pull_request_id"), entry.getString("content"));
     } 
 
-    // select pull request All info
+    // select pull request all info
     function selectPullRequestAllInfo(string memory pull_request_id) 
         public
         view
@@ -465,4 +467,58 @@ contract OpenSource {
          
         return (pull_request_id_list, content_list);
     } 
+
+    // add pull request comment info
+    function addPullRequestCommentData(string memory pull_request_comment_id, string memory content) 
+        public
+        returns (int256)
+    {
+        Table pull_request_comment_table = tableFactory.openTable(PULL_REQUEST_COMMENT_TABLE);
+        Entry pull_request_comment_entry = pull_request_comment_table.newEntry();
+        pull_request_comment_entry.set("pull_request_comment_id", pull_request_comment_id);
+        pull_request_comment_entry.set("content", content);
+
+        int256 count = pull_request_comment_table.insert(pull_request_comment_id, pull_request_comment_entry);
+        return count;
+    }
+
+    // select pull request comment latest info
+    function selectPullRequestCommentInfo(string memory pull_request_comment_id) 
+        public
+        view
+        returns (string memory, string memory)
+    {
+        Table pull_request_comment_table = tableFactory.openTable(PULL_REQUEST_COMMENT_TABLE);
+        Condition condition = pull_request_comment_table.newCondition();
+        Entries entries = pull_request_comment_table.select(pull_request_comment_id, condition);
+         if (entries.size() == 0) {
+            return ("", "");
+        }
+        Entry entry = entries.get(entries.size()-1);
+        return (entry.getString("pull_request_comment_id"), entry.getString("content"));
+    } 
+
+    // select pull request comment all info
+    function selectPullRequestCommentAllInfo(string memory pull_request_comment_id) 
+        public
+        view
+        returns (string[] memory, string[] memory)
+    {
+        Table pull_request_comment_table = tableFactory.openTable(PULL_REQUEST_COMMENT_TABLE);
+        Condition condition = pull_request_comment_table.newCondition();
+        Entries entries = pull_request_comment_table.select(pull_request_comment_id, condition);
+        string[] memory pull_request_id_comment_list = new string[](uint256(entries.size()));
+        string[] memory content_list = new string[](uint256(entries.size()));
+         
+        for (int256 i = 0; i < entries.size(); ++i) {
+            Entry entry = entries.get(i);
+
+            pull_request_id_comment_list[uint256(i)] = entry.getString("pull_request_id_comment");
+            content_list[uint256(i)] = entry.getString("content");
+        }
+         
+        return (pull_request_id_comment_list, content_list);
+    } 
+
+
 }

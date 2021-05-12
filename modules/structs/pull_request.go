@@ -16,7 +16,7 @@ type UploadPullReuqestOption struct {
 	Reponame          string   `json:"reponame"`
 	Ownername         string   `json:"ownername"`
 	Username          string   `json:"username"`
-	Content           string   `json:"message"`
+	Content           string   `json:"content"`
 	CommitShas        []string `json:"commit_shas"`
 }
 

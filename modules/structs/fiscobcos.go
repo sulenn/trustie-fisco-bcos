@@ -16,7 +16,7 @@ type FiscoBcos struct {
 	Author     string `json:"author"`
 	Email      string `json:"email"`
 	Time       string `json:"time"`
-	Content    string `json:"message"`
+	Content    string `json:"content"`
 	CommitDiff string `json:"commit_diff"`
 
 	// repo push 相关
@@ -28,7 +28,7 @@ type FiscoBcos struct {
 	CommitShas []string `json:"commit_shas"`
 	// repo_id, username, time
 
-	// pull request 相关
+	// repo pull request 相关
 	PullRequestID     string   `json:"pull_request_id"`
 	PullRequestNumber uint64   `json:"pull_request_number"`
 	Action            string   `json:"action"`
@@ -39,8 +39,14 @@ type FiscoBcos struct {
 	Reviewers         []string `json:"reviewers"`
 	MergeUser         string   `json:"merge_user"`
 	CreatedAt         string   `json:"created_at"`
-	UpdatedAt         string   `json:"updated_ad"`
+	UpdatedAt         string   `json:"updated_at"`
 	// repo_id, reponame, ownername, username, content, commit_shas
+
+	// repo pull request comment 相关
+	PullRequestCommentID     string `json:"pull_request_comment_id"`
+	PullRequestCommentNumber uint64 `json:"pull_request_comment_number"`
+	ParentID                 string `json:"parent_id"`
+	// pull_request_number, repo_id, reponame, ownername, username, action, content, created_at, updated_at
 
 	// user 相关
 	Username string `json:"username"` // 用户名

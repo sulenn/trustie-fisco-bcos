@@ -82,6 +82,27 @@ func HandleAllRoutes(ctx *macaron.Context, opt api.FiscoBcos, logger *log.Logger
 		repo.SelectPullRequestLatestInfo(ctx, opt.PullRequestID, logger)
 	case "query pull request all info":
 		repo.SelectPullRequestAllInfo(ctx, opt.PullRequestID, logger)
+	case "upload pull request comment info":
+		repo.UploadPullRequestCommentInfo(ctx,
+			api.UploadPullReuqestCommentOption{
+				PullRequestCommentID:     opt.PullRequestCommentID,
+				PullRequestCommentNumber: opt.PullRequestCommentNumber,
+				PullRequestNumber:        opt.PullRequestNumber,
+				RepoID:                   opt.RepoID,
+				ParentID:                 opt.ParentID,
+				Reponame:                 opt.Reponame,
+				Ownername:                opt.Ownername,
+				Username:                 opt.Username,
+				Action:                   opt.Action,
+				CreatedAt:                opt.CreatedAt,
+				UpdatedAt:                opt.UpdatedAt,
+				Content:                  opt.Content,
+			},
+			logger)
+	case "query pull request comment latest info":
+		repo.SelectPullRequestCommentLatestInfo(ctx, opt.PullRequestCommentID, logger)
+	case "query pull request comment all info":
+		repo.SelectPullRequestCommentAllInfo(ctx, opt.PullRequestCommentID, logger)
 	case "query user balance of single repo":
 		user.SelectUserBalance(ctx, opt.Username, opt.TokenName, logger)
 	case "query user balance of all repos":
