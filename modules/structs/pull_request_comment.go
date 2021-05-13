@@ -5,6 +5,7 @@ type UploadPullReuqestCommentOption struct {
 	PullRequestCommentNumber uint64 `json:"pull_request_comment_number"`
 	ParentID                 string `json:"parent_id"`
 	PullRequestNumber        uint64 `json:"pull_request_number"`
+	PullRequestID            string `json:"pull_request_id"`
 	RepoID                   string `json:"repo_id"`
 	Reponame                 string `json:"reponame"`
 	Ownername                string `json:"ownername"`

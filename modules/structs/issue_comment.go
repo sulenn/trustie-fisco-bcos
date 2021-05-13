@@ -4,6 +4,7 @@ type UploadIssueCommentOption struct {
 	IssueCommentID     string `json:"issue_comment_id"`
 	IssueCommentNumber uint64 `json:"issue_comment_number"`
 	IssueNumber        uint64 `json:"issue_number"`
+	IssueID            string `json:"issue_id"`
 	RepoID             string `json:"repo_id"`
 	ParentID           string `json:"parent_id"`
 	Reponame           string `json:"reponame"`

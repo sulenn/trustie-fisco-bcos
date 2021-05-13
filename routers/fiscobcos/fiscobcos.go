@@ -98,6 +98,7 @@ func HandleAllRoutes(ctx *macaron.Context, opt api.FiscoBcos, logger *log.Logger
 				CreatedAt:                opt.CreatedAt,
 				UpdatedAt:                opt.UpdatedAt,
 				Content:                  opt.Content,
+				PullRequestID:            opt.PullRequestID,
 			},
 			logger)
 	case "query pull request comment latest info":
@@ -139,6 +140,7 @@ func HandleAllRoutes(ctx *macaron.Context, opt api.FiscoBcos, logger *log.Logger
 				CreatedAt:          opt.CreatedAt,
 				UpdatedAt:          opt.UpdatedAt,
 				Content:            opt.Content,
+				IssueID:            opt.IssueID,
 			},
 			logger)
 	case "query issue comment latest info":
