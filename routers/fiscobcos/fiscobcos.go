@@ -29,13 +29,16 @@ func HandleAllRoutes(ctx *macaron.Context, opt api.FiscoBcos, logger *log.Logger
 	case "upload commit info":
 		repo.UploadCommitInfo(ctx,
 			api.UploadCommitOption{
-				CommitHash: opt.CommitHash,
-				RepoID:     opt.RepoID,
-				Author:     opt.Author,
-				Email:      opt.Email,
-				Time:       opt.Time,
-				Content:    opt.Content,
-				CommitDiff: opt.CommitDiff,
+				CommitHash:     opt.CommitHash,
+				RepoID:         opt.RepoID,
+				Author:         opt.Author,
+				AuthorEmail:    opt.AuthorEmail,
+				Committer:      opt.Committer,
+				CommitterEmail: opt.CommitterEmail,
+				AuthorTime:     opt.AuthorTime,
+				CommitterTime:  opt.CommitterTime,
+				Content:        opt.Content,
+				CommitDiff:     opt.CommitDiff,
 			},
 			logger)
 	case "query commit info":

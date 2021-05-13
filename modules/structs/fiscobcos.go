@@ -11,13 +11,16 @@ type FiscoBcos struct {
 	TokenBalance [][]interface{} `json:"token_balance"` // 用户初始Token分配
 
 	// repo commit 相关
-	CommitHash string `json:"commit_hash"`
-	RepoID     string `json:"repo_id"`
-	Author     string `json:"author"`
-	Email      string `json:"email"`
-	Time       string `json:"time"`
-	Content    string `json:"content"`
-	CommitDiff string `json:"commit_diff"`
+	CommitHash     string `json:"commit_hash"`
+	RepoID         string `json:"repo_id"`
+	Author         string `json:"author"`
+	AuthorEmail    string `json:"author_email"`
+	Committer      string `json:"committer"`
+	CommitterEmail string `json:"committer_email"`
+	AuthorTime     string `json:"author_time"`
+	CommitterTime  string `json:"committer_time"`
+	Content        string `json:"content"`
+	CommitDiff     string `json:"commit_diff"`
 
 	// repo push 相关
 	PushID     string   `json:"push_Id"`
@@ -27,6 +30,7 @@ type FiscoBcos struct {
 	Branch     string   `json:"branch"`
 	Size       uint64   `json:"size"`
 	CommitShas []string `json:"commit_shas"`
+	Time       string   `json:"time"`
 	// repo_id, username, time
 
 	// repo pull request 相关
