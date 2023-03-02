@@ -4,6 +4,7 @@
 package opensource
 
 import (
+	"fmt"
 	"math/big"
 	"strings"
 
@@ -39,6 +40,7 @@ func DeployOpenSource(auth *bind.TransactOpts, backend bind.ContractBackend) (co
 	if err != nil {
 		return common.Address{}, nil, nil, err
 	}
+	fmt.Println(parsed)
 
 	address, tx, contract, err := bind.DeployContract(auth, parsed, common.FromHex(OpenSourceBin), backend)
 	if err != nil {
