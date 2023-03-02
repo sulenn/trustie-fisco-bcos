@@ -1,3 +1,4 @@
+*.pem
 *.log
 sdk.crt
 sdk.key
