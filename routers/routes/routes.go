@@ -21,10 +21,10 @@ func RegisterRoutes(m *macaron.Macaron) {
 
 	m.Get("/", func(ctx *macaron.Context) {
 		ctx.JSON(200, "hello world")
-	})
+	});
 
 	// 统一路由入口
-	m.Group("/trustie", func() {
+	m.Group("/gitlink", func() {
 		m.Post("/fiscobcos", bind(api.FiscoBcos{}), fiscobcos.HandleAllRoutes)
 	})
 }
