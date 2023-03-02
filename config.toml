@@ -6,7 +6,7 @@ CAFile="ca.crt"
 Cert="sdk.crt"
 Key="sdk.key"
 [[Network.Connection]]
-NodeURL="127.0.0.1:20200"
+NodeURL="8.130.51.51:20200"
 GroupID=1
 # [[Network.Connection]]
 # NodeURL="127.0.0.1:20200"
