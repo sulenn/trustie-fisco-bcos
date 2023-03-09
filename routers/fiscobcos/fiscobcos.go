@@ -154,6 +154,8 @@ func HandleAllRoutes(ctx *macaron.Context, opt api.FiscoBcos, logger *log.Logger
 		user.SelectUserBalance(ctx, opt.Username, opt.TokenName, logger)
 	case "query user balance of all repos":
 		user.SelectUserAllBalance(ctx, opt.Username, logger)
+	case "query user balance of all repos by page":
+		user.SelectUserAllBalanceByPage(ctx, opt.Username, opt.Page, opt.Pagenum, logger)
 	case "add user balance":
 		user.AddUserAmount(ctx, opt.Username, opt.TokenName, opt.Amount, logger)
 	case "minus user balance":

@@ -75,6 +75,60 @@ func SelectUserAllBalance(ctx *macaron.Context, username string, logger *log.Log
 	})
 }
 
+// select user all balance by page
+func SelectUserAllBalanceByPage(ctx *macaron.Context, username string, page int, page_num int, logger *log.Logger) {
+	if username == "" {
+		ctx.JSON(http.StatusOK, api.StringEmpty)
+		return
+	}
+	configs, err := conf.ParseConfigFile("config.toml")
+	if err != nil {
+		ctx.JSON(http.StatusOK, api.UnknownErr(err))
+		return
+	}
+	config := &configs[0]
+
+	client, err := client.Dial(config)
+	if err != nil {
+		ctx.JSON(http.StatusOK, api.UnknownErr(err))
+		return
+	}
+
+	// load the contract
+	contractAddress := common.HexToAddress(contract.ContractAddress)
+	instance, err := opensource.NewOpenSource(contractAddress, client)
+	if err != nil {
+		ctx.JSON(http.StatusOK, api.UnknownErr(err))
+		return
+	}
+
+	openSourceSession := &opensource.OpenSourceSession{Contract: instance, CallOpts: *client.GetCallOpts(), TransactOpts: *client.GetTransactOpts()}
+
+	var start = 0
+	if page > 0 {
+		start = (page - 1) * page_num
+	}
+	tokenNames, balances, total_count, err := openSourceSession.SelectUserAllBalanceByPage(username, start, page_num) // call select API
+	if err != nil {
+		ctx.JSON(http.StatusOK, api.UnknownErr(err))
+		return
+	}
+	print("1111111")
+	var userBalancelist api.UserBalanceList
+	for i := 0; i < len(tokenNames); i++ {
+		userBalancelist = append(userBalancelist, &api.UserBalance{User: api.User{Username: username, TokenName: tokenNames[i]}, Balance: balances[i].Uint64()})
+		fmt.Printf("username: %v, token_name: %v, balance: %v, total: %v \n", username, tokenNames[i], balances[i], total_count)
+	}
+	ctx.JSON(http.StatusOK, &structs.ResponseUserBalanceListByPage{
+		UserBalanceList: userBalancelist,
+		Response: structs.Response{
+			Status:  0,
+			Message: "query success!",
+		},
+		TotalCount: total_count.Uint64(),
+	})
+}
+
 // select user balance
 func SelectUserBalance(ctx *macaron.Context, username string, tokenName string, logger *log.Logger) {
 	if username == "" || tokenName == "" {

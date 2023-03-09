@@ -17,6 +17,12 @@ type ResponseUserBalanceList struct {
 	UserBalanceList
 }
 
+type ResponseUserBalanceListByPage struct {
+	Response
+	UserBalanceList
+	TotalCount uint64 `json:"total_count"`
+}
+
 type ResponseUserBalance struct {
 	UserBalance
 	Response

@@ -558,9 +558,34 @@ func (_OpenSource *OpenSourceCaller) SelectUserAllBalance(opts *bind.CallOpts, u
 
 // SelectUserAllBalance is a free data retrieval call binding the contract method 0xc50573fa.
 //
+// Solidity: function selectUserAllBalanceByPage(string username, int start, int page_num) constant returns(string[], uint256[], uint256)
+func (_OpenSource *OpenSourceCaller) SelectUserAllBalanceByPage(opts *bind.CallOpts, username string, start int, page_num int) ([]string, []*big.Int, *big.Int, error) {
+	var (
+		ret1 = new([]string)
+		ret2 = new([]*big.Int)
+		ret3 = new(big.Int)
+	)
+	out := &[]interface{}{
+		ret1,
+		ret2,
+		ret3,
+	}
+	err := _OpenSource.contract.Call(opts, out, "selectUserAllBalanceByPage", username, start, page_num)
+	return *ret1, *ret2, ret3, err
+}
+
+// SelectUserAllBalance is a free data retrieval call binding the contract method 0xc50573fa.
+//
 // Solidity: function selectUserAllBalance(string username) constant returns(string[], string[], uint256[])
 func (_OpenSource *OpenSourceSession) SelectUserAllBalance(username string) ([]string, []string, []*big.Int, error) {
 	return _OpenSource.Contract.SelectUserAllBalance(&_OpenSource.CallOpts, username)
+}
+
+// SelectUserAllBalance is a free data retrieval call binding the contract method 0xc50573fa.
+//
+// Solidity: function selectUserAllBalanceByPage(string username, int start, int page_num) constant returns(string[], uint256[])
+func (_OpenSource *OpenSourceSession) SelectUserAllBalanceByPage(username string, start int, page_num int) ([]string, []*big.Int, *big.Int, error) {
+	return _OpenSource.Contract.SelectUserAllBalanceByPage(&_OpenSource.CallOpts, username, start, page_num)
 }
 
 // SelectUserAllBalance is a free data retrieval call binding the contract method 0xc50573fa.
