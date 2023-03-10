@@ -70,6 +70,6 @@ type FiscoBcos struct {
 	Payee    string `json:"payee"`    // 收款人
 
 	// page 相关
-	Page    int `json:"page"`     // 分页的第几页
-	Pagenum int `json:"page_num"` // 分页每一页的需求数量
+	Page    int64 `json:"page"`     // 分页的第几页
+	Pagenum int64 `json:"page_num"` // 分页每一页的需求数量
 }

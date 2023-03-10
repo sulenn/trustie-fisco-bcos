@@ -121,10 +121,19 @@ contract OpenSource {
         Condition condition = user_table.newCondition();
 
         Entries entries = user_table.select(username, condition);
+
+        if (start + page_num > entries.size()) {
+            page_num = entries.size() - start;
+
+            if (page_num < 0) {
+                page_num = 0;
+            }
+        }
+
         string[] memory token_name_list = new string[](uint256(page_num));
         uint256[] memory balance_list = new uint256[](uint256(page_num));
         uint256 total_count = uint256(entries.size());
-        for (int256 i = int256(start); i < start + page_num; ++i) {
+        for (int256 i = start; i < start + page_num; i++) {
             Entry entry = entries.get(i);
             token_name_list[uint256(i - start)] = entry.getString("token_name");
             balance_list[uint256(i - start)] = entry.getUInt("balance");

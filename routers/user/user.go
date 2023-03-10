@@ -76,7 +76,7 @@ func SelectUserAllBalance(ctx *macaron.Context, username string, logger *log.Log
 }
 
 // select user all balance by page
-func SelectUserAllBalanceByPage(ctx *macaron.Context, username string, page int, page_num int, logger *log.Logger) {
+func SelectUserAllBalanceByPage(ctx *macaron.Context, username string, page int64, page_num int64, logger *log.Logger) {
 	if username == "" {
 		ctx.JSON(http.StatusOK, api.StringEmpty)
 		return
@@ -104,16 +104,17 @@ func SelectUserAllBalanceByPage(ctx *macaron.Context, username string, page int,
 
 	openSourceSession := &opensource.OpenSourceSession{Contract: instance, CallOpts: *client.GetCallOpts(), TransactOpts: *client.GetTransactOpts()}
 
-	var start = 0
+	var start = int64(0)
 	if page > 0 {
-		start = (page - 1) * page_num
+		start = (page - int64(1)) * page_num
 	}
-	tokenNames, balances, total_count, err := openSourceSession.SelectUserAllBalanceByPage(username, start, page_num) // call select API
+	print(start)
+	print(page_num)
+	tokenNames, balances, total_count, err := openSourceSession.SelectUserAllBalanceByPage(username, big.NewInt(start), big.NewInt(page_num)) // call select API
 	if err != nil {
 		ctx.JSON(http.StatusOK, api.UnknownErr(err))
 		return
 	}
-	print("1111111")
 	var userBalancelist api.UserBalanceList
 	for i := 0; i < len(tokenNames); i++ {
 		userBalancelist = append(userBalancelist, &api.UserBalance{User: api.User{Username: username, TokenName: tokenNames[i]}, Balance: balances[i].Uint64()})
